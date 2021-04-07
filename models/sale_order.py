@@ -19,10 +19,6 @@ class SaleOrder(models.Model):
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
 
 
-def action_confirm(self):
-    raise UserError(_('test'))
-
-
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -42,8 +38,8 @@ class SaleOrderLine(models.Model):
                                   readonly=True,
                                   default=lambda self: self.env.ref('uom.product_uom_kgm'),
                                   domain=lambda self: [('category_id', '=', self.env.ref('uom.product_uom_categ_kgm').id)])
-    volume = fields.Float(string='Volume', digits='Volume', help='Help note')
-    poids = fields.Float(string='Poids', digits='Stock Weight', help='Help note')
+    volume = fields.Float(string='Volume', digits='Volume', help='Volume is computed from dimensions but can be overwritten')
+    poids = fields.Float(string='Poids', digits='Stock Weight', help='Weight is always in kg')
     longueur = fields.Integer(string="Longueur", help='Longueur en cm')
     largeur = fields.Integer(string="Largeur", help='Largeur en cm')
     hauteur = fields.Integer(string="Hauteur", help='Hauteur en cm')
@@ -52,17 +48,14 @@ class SaleOrderLine(models.Model):
     def contenant_id_change(self):
         if not self.contenant_id:
             return
-        # je vais dans le produit contenant
-        volume = self.contenant_id.volume
-        # je prends le champ volume
-        self.volume = volume
+        self.volume = self.contenant_id.volume
 
     @api.onchange('longueur', 'largeur', 'hauteur')
     def dimensions_change(self):
-        calcul_volume = self.longueur * self.largeur * self.hauteur/1000000
-        self.volume = calcul_volume
+        self.volume = self.longueur * self.largeur * self.hauteur/1000000
 
     def _get_display_price(self, product):
+        # WIP HERE
         if self.order_id.pricelist_id.type == 'fret':
             product = product.with_context(
                 iledepart=self.order_id.iledepart_id,
