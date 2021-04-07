@@ -16,17 +16,18 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
     'depends': [
         'base',
         'revatua_connector',
-        'event_sale',
-        'stock',
+        'sale_order_type',
     ],
 
     # always loaded
     'data': [
-        'views/sale_order_views.xml',
-        'views/product_template_views.xml',
         #'security/revatua_security.xml',
         #'security/ir.model.access.csv',
+        'data/sale_order_type_data.xml',
         #'data/res.country.state.csv',
+        'views/sale_order_views.xml',
+        'views/product_template_views.xml',
+        'views/product_pricelist_views.xml',
         #'views/revatua_menu_views.xml',
         #'views/voyage_views.xml',
         #'views/res_company_views.xml',

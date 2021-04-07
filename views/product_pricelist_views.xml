@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_pricelist_item_form_view_revatua" model="ir.ui.view">
+        <field name="name">product.pricelist.item.form.revatua</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <group name="pricelist_rule_target" position="before">
+                <group name="fret_special">
+                    <field name="ile1_id"/>
+                    <field name="ile2_id"/>
+                </group>
+            </group>
+        </field>
+    </record>
+    <record id="product_pricelist_view_revatua" model="ir.ui.view">
+        <field name="name">product.pricelist.form.revatua</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <group name="pricelist_settings" position="inside">
+                <field name="type"/>
+            </group>
+        </field>
+    </record>
+</odoo>
