@@ -14,9 +14,11 @@ class SaleOrder(models.Model):
 
     iledepart_id = fields.Many2one(comodel_name='res.country.state',
                                    string='Ile de Départ',
+                                   domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                    help='Île de départ (on sélectionne par défaut l\'île de l\'expéditeur)')
     ilearrivee_id = fields.Many2one(comodel_name='res.country.state',
                                     string='Ile d\'arrivée',
+                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
     voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage', help='Choisissez le voyage')
 
