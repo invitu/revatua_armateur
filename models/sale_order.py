@@ -1,6 +1,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from datetime import datetime
 
 
 class SaleOrder(models.Model):
@@ -17,6 +18,28 @@ class SaleOrder(models.Model):
     ilearrivee_id = fields.Many2one(comodel_name='res.country.state',
                                     string='Ile d\'arrivée',
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
+    voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage', help='Choisissez le voyage')
+
+    @api.onchange('iledepart_id', 'ilearrivee_id')
+    def set_domain_for_voyage(self):
+        trajet_from_ids = self.env['trajet'].search([
+            ('ile_depart_id', '=', self.iledepart_id.id),
+            ('date_depart', '>', datetime.now()),
+        ]).ids
+        trajet_to_ids = self.env['trajet'].search([
+            ('ile_arrivee_id', '=', self.ilearrivee_id.id),
+            ('date_depart', '>', datetime.now()),
+        ]).ids
+
+        voyage_list = self.env['voyage'].search([
+            ('trajet_ids', 'in', trajet_from_ids),
+            ('trajet_ids', 'in', trajet_to_ids),
+            ('state', '=', 'confirm'),
+        ]).ids
+
+        res = {}
+        res['domain'] = {'voyage_id': [('id', 'in', voyage_list)]}
+        return res
 
 
 class SaleOrderLine(models.Model):
