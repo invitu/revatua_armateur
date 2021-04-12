@@ -75,6 +75,44 @@ class SaleOrderLine(models.Model):
             return
         self.volume = self.contenant_id.volume
 
+    @api.onchange('product_id')
+    def product_id_change(self):
+        # Version a l'arrache complet... il faut faire gaffe !!!
+        res = super(SaleOrderLine, self).product_id_change()
+        if self.order_id.pricelist_id.type == 'fret' and self.product_id:
+            vals = {}
+            iledepart = self.order_id.iledepart_id
+            ilearrivee = self.order_id.ilearrivee_id
+            # on cherche le prix dans la priicelist a l'arrache
+            # on shunte vraiment tout... date de validity, qty_min_max, type de rule... faut que ca marche vite fait pour Terevau Piti
+            pricelistitems = self.order_id.pricelist_id.item_ids.search([
+                ('pricelist_id', '=', self.order_id.pricelist_id.id),
+                ('ile1_id', 'in', [iledepart.id, ilearrivee.id]),
+                ('ile2_id', 'in', [iledepart.id, ilearrivee.id]),
+                ('product_tmpl_id', '=', self.product_id.product_tmpl_id.id),
+            ])
+            # Ici on considère qu'on a qu'un seul résultat et que le prix est en mode fixed price...etc... bref, on est vraiment dans du specifique
+            price = pricelistitems[0].fixed_price
+            # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
+            pricevolume = price * self.volume
+            priceweight = price * self.poids
+
+            vals['price_unit'] = max(pricevolume, priceweight)
+            self.update(vals)
+        return res
+
+    @api.onchange('product_uom_qty')
+    def product_uom_change(self):
+        # On prend le dessus, si c'est du fret, on laisse pas le comportement standard....
+        if self.order_id.pricelist_id.type == 'fret':
+            vals = {}
+            vals['price_unit'] = self.price_unit
+            self.update(vals)
+        else:
+            # Si c'est pas du fret, c'est cool, on laisse faire
+            super(SaleOrderLine, self).product_uom_change()
+        return
+
     @api.onchange('longueur', 'largeur', 'hauteur')
     def dimensions_change(self):
         self.volume = self.longueur * self.largeur * self.hauteur/1000000
