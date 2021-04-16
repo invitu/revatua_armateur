@@ -57,11 +57,14 @@ class SaleOrder(models.Model):
     @api.onchange('type_facturation')
     def set_adresse_facturation(self):
         if self.type_facturation == 'expediteur':
-            self.partner_invoice_id = self.partner_id
+            addr = self.partner_id.address_get(['invoice'])
+            self.partner_invoice_id = addr['invoice']
         elif self.type_facturation == 'destinataire':
-            self.partner_invoice_id = self.partner_shipping_id
+            addr = self.partner_shipping_id.address_get(['invoice'])
+            self.partner_invoice_id = addr['invoice']
         else:
             self.partner_invoice_id = self.env.ref('revatua_connector.partner_dgae')
+
 
 
 class SaleOrderLine(models.Model):
