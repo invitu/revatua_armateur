@@ -95,7 +95,7 @@ class SaleOrderLine(models.Model):
             price = pricelistitems[0].fixed_price
             # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
             pricevolume = price * self.volume
-            priceweight = price * self.poids
+            priceweight = price * self.poids / 1000
 
             vals['price_unit'] = max(pricevolume, priceweight)
             self.update(vals)
