@@ -7,5 +7,5 @@ from odoo import api, fields, models, _
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    id_revatua = fields.Char(string='Code Revatua', size=64,
+    code_revatua = fields.Char(string='Code Revatua', size=64,
                              help='Code Revatua')

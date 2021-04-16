@@ -1,4 +1,4 @@
-"id","id_revatua","name","property_cost_method","property_valuation"
+"id","code_revatua","name","property_cost_method","property_valuation"
 "revatua_armateur.product.cat_ppn","PPN","Produits de première nécessité pris en charge","Prix standard","Manuel"
 "revatua_armateur.product.cat_pgc","PGC","Produits de grande consommation","Prix standard","Manuel"
 "revatua_armateur.product.cat_frigodgae","FRIGODGAE","Produit en frigo pris en charge","Prix standard","Manuel"

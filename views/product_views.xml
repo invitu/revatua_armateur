@@ -7,7 +7,7 @@
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
             <field name="parent_id" position="before">
-                    <field name="id_revatua"/>
+                    <field name="code_revatua"/>
             </field>
         </field>
     </record>
