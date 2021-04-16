@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_category_form_view_revatua" model="ir.ui.view">
+        <field name="name">product.category.form.revatua</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="before">
+                    <field name="id_revatua"/>
+            </field>
+        </field>
+    </record>
+</odoo>
