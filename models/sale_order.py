@@ -21,6 +21,17 @@ class SaleOrder(models.Model):
                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
     voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage', help='Choisissez le voyage')
+    type_facturation = fields.Selection([
+        ('expediteur', 'Fret sur l\'expéditeur'),
+        ('destinataire', 'Fret sur le destinataire'),
+        ('dgae', 'La DGAE')
+    ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
+
+    def order_is_not_fret(self):
+       if type_id == self.env.ref('fret.sale.type'):
+           return False
+       else:
+           return True
 
     @api.onchange('iledepart_id', 'ilearrivee_id')
     def set_domain_for_voyage(self):
@@ -42,6 +53,15 @@ class SaleOrder(models.Model):
         res = {}
         res['domain'] = {'voyage_id': [('id', 'in', voyage_list)]}
         return res
+
+    @api.onchange('type_facturation')
+    def set_adresse_facturation(self):
+        if self.type_facturation == 'expediteur':
+            self.partner_invoice_id = self.partner_id
+        elif self.type_facturation == 'destinataire':
+            self.partner_invoice_id = self.partner_shipping_id
+        else:
+            self.partner_invoice_id = self.env.ref('revatua_connector.partner_dgae')
 
 
 class SaleOrderLine(models.Model):
