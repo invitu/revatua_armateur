@@ -16,15 +16,9 @@
                     <label for="matiere_dangereuse"/>
                 </div>
             </div>
-            <!--<div name="pricing" position="after">-->
-                    <!--<label for="prix_volume"/>-->
-                    <!--<div name="prix_volume_uom" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}" class="o_row">-->
-                        <!--<field name="prix_volume" widget='monetary' options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>-->
-                        <!--<span groups="uom.group_uom" class="oe_read_only">per-->
-                        <!--<field name="uom_name"/>-->
-                        <!--</span>-->
-                    <!--</div>-->
-           <!--</div>-->
+            <field name="categ_id" position="after">
+                <field name="nomenclaturepfcustoms_id"/>
+            </field>
         </field>
     </record>
 </odoo>

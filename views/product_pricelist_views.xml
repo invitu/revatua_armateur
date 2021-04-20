@@ -32,6 +32,14 @@
         <field name="inherit_id" ref="product.product_pricelist_view"/>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
+            <sheet position="before">
+                <header>
+                    <button name="revatua_armateur.action_view_wizard_pricelist_get_revatua"
+                        type="action" string="Get Revatua Prices" class="btn-primary"
+                        attrs="{'invisible': [('type', '!=', 'fret')]}"
+                        />
+                </header>
+            </sheet>
             <widget name="web_ribbon" position="before">
                 <div class="oe_button_box" name="button_box">
                     <button string="Pricelist Items" type="object"

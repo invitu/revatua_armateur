@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -28,10 +30,10 @@ class SaleOrder(models.Model):
     ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
 
     def order_is_not_fret(self):
-       if type_id == self.env.ref('fret.sale.type'):
-           return False
-       else:
-           return True
+        if self.type_id == self.env.ref('fret.sale.type'):
+            return False
+        else:
+            return True
 
     @api.onchange('iledepart_id', 'ilearrivee_id')
     def set_domain_for_voyage(self):
@@ -64,7 +66,6 @@ class SaleOrder(models.Model):
             self.partner_invoice_id = addr['invoice']
         else:
             self.partner_invoice_id = self.env.ref('revatua_connector.partner_dgae')
-
 
 
 class SaleOrderLine(models.Model):
@@ -100,22 +101,36 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id')
     def product_id_change(self):
+        self.ensure_one()
         # Version a l'arrache complet... il faut faire gaffe !!!
         res = super(SaleOrderLine, self).product_id_change()
         if self.order_id.pricelist_id.type == 'fret' and self.product_id:
+            date = self.order_id.validity_date or self.order_id.date_order or self._context.get('date') or fields.Datetime.now()
             vals = {}
-            iledepart = self.order_id.iledepart_id
-            ilearrivee = self.order_id.ilearrivee_id
-            # on cherche le prix dans la priicelist a l'arrache
-            # on shunte vraiment tout... date de validity, qty_min_max, type de rule... faut que ca marche vite fait pour Terevau Piti
-            pricelistitems = self.order_id.pricelist_id.item_ids.search([
-                ('pricelist_id', '=', self.order_id.pricelist_id.id),
-                ('ile1_id', 'in', [iledepart.id, ilearrivee.id]),
-                ('ile2_id', 'in', [iledepart.id, ilearrivee.id]),
-                ('product_tmpl_id', '=', self.product_id.product_tmpl_id.id),
-            ])
+            iles_ids = (self.order_id.iledepart_id.id, self.order_id.ilearrivee_id.id)
+            # on cherche le prix dans la priicelist
+            # on shunte la méthode originale et on réécrit dans le contexte Fret
+            self.env.cr.execute(
+                """
+                SELECT
+                    item.id
+                FROM
+                    product_pricelist_item AS item
+                WHERE
+                    (item.pricelist_id = %s)
+                    AND (item.categ_id = %s)
+                    AND (item.date_start IS NULL OR item.date_start<=%s)
+                    AND (item.date_end IS NULL OR item.date_end>=%s)
+                    AND (item.ile1_id in %s)
+                    AND (item.ile2_id in %s)
+                """,
+                (self.order_id.pricelist_id.id, self.product_id.categ_id.id, date, date, iles_ids, iles_ids)
+            )
+
+            item_ids = [x[0] for x in self.env.cr.fetchall()]
+            pricelistitems = self.env['product.pricelist.item'].browse(item_ids)
             # Ici on considère qu'on a qu'un seul résultat et que le prix est en mode fixed price...etc... bref, on est vraiment dans du specifique
-            price = pricelistitems[0].fixed_price
+            price = pricelistitems and pricelistitems[0].fixed_price or 0.0
             # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
             pricevolume = price * self.volume
             priceweight = price * self.poids / 1000
