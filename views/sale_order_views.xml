@@ -58,21 +58,24 @@
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="before">
                 <!--<field name="contenant_id" invisible="order_is_not_fret()"/>-->
                 <field name="contenant_id"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
+                <field name="unit_compute"/>
                 <field name="longueur"/>
                 <field name="largeur"/>
                 <field name="hauteur"/>
                 <field name="volume"/>
-                <field name="unite_volume"/>
+                <field name="poids"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="attributes">
                 <attribute name="domain">['&amp;', '&amp;', ('est_contenant', '=', False), ('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
-                <field name="poids"/>
-                <field name="unite_poids"/>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='tax_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>

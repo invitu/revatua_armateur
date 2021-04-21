@@ -92,6 +92,17 @@ class SaleOrderLine(models.Model):
     longueur = fields.Integer(string="Longueur", help='Longueur en cm')
     largeur = fields.Integer(string="Largeur", help='Largeur en cm')
     hauteur = fields.Integer(string="Hauteur", help='Hauteur en cm')
+    unit_compute = fields.Boolean(string='Unit Compute',
+                                  default=False,
+                                  help='On coche quand on veut un calcul unitaire')
+
+    @api.onchange('unit_compute')
+    def compute_unit_price(self):
+        if not self.unit_compute:
+            new_price_unit = self.price_unit / self.product_uom_qty
+        elif self.unit_compute:
+            new_price_unit = self.price_unit * self.product_uom_qty
+        self.update({'price_unit': new_price_unit})
 
     @api.onchange('contenant_id')
     def contenant_id_change(self):
@@ -99,8 +110,8 @@ class SaleOrderLine(models.Model):
             return
         self.volume = self.contenant_id.volume
 
-    @api.onchange('product_id')
-    def product_id_change(self):
+    @api.onchange('product_id', 'volume', 'poids')
+    def product_id_volume_poids_change(self):
         self.ensure_one()
         # Version a l'arrache complet... il faut faire gaffe !!!
         res = super(SaleOrderLine, self).product_id_change()
@@ -135,7 +146,11 @@ class SaleOrderLine(models.Model):
             pricevolume = price * self.volume
             priceweight = price * self.poids / 1000
 
-            vals['price_unit'] = max(pricevolume, priceweight)
+            # on voit si le volume est en global ou à l'unité
+            if self.unit_compute:
+                vals['price_unit'] = max(pricevolume, priceweight)
+            elif not self.unit_compute:
+                vals['price_unit'] = max(pricevolume, priceweight)/self.product_uom_qty
             self.update(vals)
         return res
 
