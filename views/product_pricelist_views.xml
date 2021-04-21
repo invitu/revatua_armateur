@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="product_pricelist_item_tree_view_revatua" model="ir.ui.view">
+        <field name="name">product.pricelist.item.tree.revatua</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_tree_view"/>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="ile1_id"/>
+                <field name="ile2_id"/>
+            </field>
+        </field>
+    </record>
     <record id="product_pricelist_item_form_view_revatua" model="ir.ui.view">
         <field name="name">product.pricelist.item.form.revatua</field>
         <field name="model">product.pricelist.item</field>
@@ -20,6 +32,15 @@
         <field name="inherit_id" ref="product.product_pricelist_view"/>
         <field name="priority" eval="8"/>
         <field name="arch" type="xml">
+            <widget name="web_ribbon" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button string="Pricelist Items" type="object"
+                        name="action_view_related_pricelist_items"
+                        class="oe_stat_button" icon="fa-exchange"
+                        context="{'no_reference': True}"
+                        />
+                </div>
+            </widget>
             <group name="pricelist_settings" position="inside">
                 <field name="type"/>
             </group>

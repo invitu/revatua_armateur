@@ -15,23 +15,19 @@ class Pricelist(models.Model):
         string='Type',
         help='Select the pricelist type')
 
-    # def _compute_price_rule_get_items(self, products_qty_partner, date, uom_id, prod_tmpl_ids, prod_ids, categ_ids):
-        # self.ensure_one()
-        # res = super(Pricelist, self)._compute_price_rule_get_items(products_qty_partner, date, uom_id, prod_tmpl_ids, prod_ids, categ_ids)
-        # if self.type == 'fret':
-            # __import__('pdb').set_trace()
-            # print(res)
-            # on recupere la sale_order concernée
-            # order_ids = self.env.context.get('active_ids', [])
-            # order_rec = self.env['sale.order'].browse(order_ids)
-            # on recup ile depart et ile arrivee
-            # on filtre la liste en fonction du depart/arrivée
-            # on renvoit la nouvelle liste
-
-            # return res
-        # else:
-            # return res
-
+    def action_view_related_pricelist_items(self):
+        self.ensure_one()
+        domain = [('pricelist_id', '=', self.id)]
+        action = {
+            'name': _('Pricelist Items'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'product.pricelist.item',
+            'view_type': 'list',
+            'view_mode': 'list,form',
+            'domain': domain,
+            'context': {'default_pricelist_id': self.id},
+        }
+        return action
 
 
 class PricelistItem(models.Model):
