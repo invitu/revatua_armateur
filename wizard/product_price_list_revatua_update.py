@@ -5,6 +5,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 from datetime import datetime
+import pytz
 
 
 class WizardPriceilistGetRevatua(models.TransientModel):
@@ -14,13 +15,14 @@ class WizardPriceilistGetRevatua(models.TransientModel):
     date = fields.Date(string='Date', help='Enter the date of the validity')
 
     def get_tarif(self):
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         date = datetime.strftime(self.date, '%Y-%m-%d')
         url = 'tarifs/actif?dateTarif='+date+'&detailTarif=true'
 
         tarif_response = self.env['revatua.api'].api_get(url)
         version = tarif_response.json()["version"]
         idrevatua = tarif_response.json()["id"]
-        datetarif = tarif_response.json()["dateApplication"]
+        datetarif = timezone.localize(datetime.strptime(tarif_response.json()["dateApplication"], '%Y-%m-%d')).astimezone(pytz.timezone('UTC')).strftime("%Y-%m-%d %H:%M")
         tarifmini = tarif_response.json()["tarifMinimum"]
         detailtarif = tarif_response.json()["detailTarifs"]
         print(version)
