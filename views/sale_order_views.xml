@@ -27,8 +27,10 @@
                     <field name="voyage_id"/>
                 </group>
             </group>
+            <field name="partner_invoice_id" position="replace"/>
             <group name="partner_details" position="inside">
                 <field name="type_facturation" attrs="{'invisible': [('type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
+                <field name="partner_invoice_id" groups="sale.group_delivery_invoice_address" context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
             </group>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="before">
                 <!--<field name="contenant_id" invisible="order_is_not_fret()"/>-->
