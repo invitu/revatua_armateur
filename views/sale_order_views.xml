@@ -16,10 +16,26 @@
         parent="revatua_connector.revatua_main_menu"
         />
 
+    <record id="action_revatua_pricelist" model="ir.actions.act_window">
+        <field name="name">Tarifs</field>
+        <field name="res_model">product.pricelist</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="product.product_pricelist_view_tree"/>
+        <field name="domain">[('type', '=', 'fret')]</field>
+        <field name="context">{'default_type': 'fret'}</field>
+    </record>
+
+    <menuitem name="Tarifs"
+        id="menu_revatua_pricelist"
+        action="action_revatua_pricelist"
+        sequence="5"
+        parent="revatua_connector.menu_revatua_configuration"
+        />
+
     <record id="sale_order_view_form_revatua" model="ir.ui.view">
         <field name="name">sale.order.form.view.revatua</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="inherit_id" ref="sale_order_type.sot_view_order_form" />
         <field name="arch" type="xml">
             <field name="type_id" position="attributes">
                 <attribute name="invisible">1</attribute>
