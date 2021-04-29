@@ -30,6 +30,7 @@ class SaleOrder(models.Model):
     ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
     revatua_code = fields.Char(string='Code Revatua', size=64,)
     id_revatua = fields.Char(string='ID Revatua', size=64,)
+    version = fields.Char(string='Revatua Version', size=64,)
 
     def order_is_not_fret(self):
         if self.type_id == self.env.ref('fret.sale.type'):
@@ -152,6 +153,7 @@ class SaleOrder(models.Model):
                 "detailConnaissementDTO": lines,
             }
             order_response = order.env['revatua.api'].api_post("connaissements", payload)
+            order.version = order_response.json()["version"]
             order.id_revatua = order_response.json()["id"]
             # Confirmation dans Revatua
             url = "connaissements/" + order.id_revatua + "/changeretat"
