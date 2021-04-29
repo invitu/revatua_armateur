@@ -75,41 +75,29 @@ class SaleOrder(models.Model):
     def _get_order_lines(self):
         lines = []
         for line in self.order_line:
+            datas = {}
             if line.unit_compute:
                 poidstotal = line.poids * line.product_uom_qty
                 volumetotal = line.volume * line.product_uom_qty
             else:
                 poidstotal = line.poids
                 volumetotal = line.volume
+            datas = {
+                "nbColis": line.product_uom_qty,
+                "contenant": line.contenant_id.name,
+                "description": line.name,
+                "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
+                "codeTarif": line.product_id.categ_id.code_revatua,
+                "stockage": "CALE",
+                "poids": poidstotal,
+                "unitePoids": line.unite_poids.code_revatua,
+                "volume": volumetotal,
+                "uniteVolume": line.unite_volume.code_revatua,
+                "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
+            }
             if not line.official_price:
-                lines.append({
-                    "nbColis": line.product_uom_qty,
-                    "contenant": line.contenant_id.name,
-                    "description": line.name,
-                    "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
-                    "codeTarif": line.product_id.categ_id.code_revatua,
-                    "stockage": "CALE",
-                    "poids": poidstotal,
-                    "unitePoids": line.unite_poids.code_revatua,
-                    "volume": volumetotal,
-                    "uniteVolume": line.unite_volume.code_revatua,
-                    "montantLibre": line.price_subtotal,
-                    "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
-                })
-            else:
-                lines.append({
-                    "nbColis": line.product_uom_qty,
-                    "contenant": line.contenant_id.name,
-                    "description": line.name,
-                    "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
-                    "codeTarif": line.product_id.categ_id.code_revatua,
-                    "stockage": "CALE",
-                    "poids": poidstotal,
-                    "unitePoids": line.unite_poids.code_revatua,
-                    "volume": volumetotal,
-                    "uniteVolume": line.unite_volume.code_revatua,
-                    "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
-                })
+                datas["montantLibre"] = line.price_subtotal
+            lines.append(datas)
 
         return lines
 
