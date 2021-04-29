@@ -224,7 +224,9 @@ class SaleOrderLine(models.Model):
     unit_compute = fields.Boolean(string='Unit Compute',
                                   default=False,
                                   help='On coche quand on veut un calcul unitaire')
-    official_price = fields.Boolean(string='Official Price', default=False)
+    official_price = fields.Boolean(string='Official Price',
+                                    readonly=True,
+                                    default=False)
 
     @api.onchange('unit_compute')
     def compute_unit_price(self):
@@ -277,7 +279,7 @@ class SaleOrderLine(models.Model):
             priceweight = price * self.poids / 1000
 
             # on tague le champ official price
-            self.official_price = pricelistitems and pricelistitems[0].official_price
+            vals['official_price'] = pricelistitems and pricelistitems[0].official_price
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
