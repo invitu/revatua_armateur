@@ -65,6 +65,7 @@ class WizardPriceilistGetRevatua(models.TransientModel):
                             'compute_price': 'fixed',
                             'fixed_price': montant,
                             'date_start': datetarif,
+                            'official_price': True,
                         })]
                     })
             else:

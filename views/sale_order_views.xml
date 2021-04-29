@@ -48,6 +48,8 @@
                     <field name="iledepart_id"/>
                     <field name="ilearrivee_id"/>
                     <field name="voyage_id"/>
+                    <field name="id_revatua"/>
+                    <field name="revatua_code"/>
                 </group>
             </group>
             <field name="partner_invoice_id" position="replace"/>

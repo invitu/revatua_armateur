@@ -28,6 +28,8 @@ class SaleOrder(models.Model):
         ('destinataire', 'Fret sur le destinataire'),
         ('dgae', 'La DGAE')
     ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
+    revatua_code = fields.Char(string='Code Revatua', size=64,)
+    id_revatua = fields.Char(string='ID Revatua', size=64,)
 
     def order_is_not_fret(self):
         if self.type_id == self.env.ref('fret.sale.type'):
@@ -67,6 +69,101 @@ class SaleOrder(models.Model):
         else:
             self.partner_invoice_id = self.env.ref('revatua_connector.partner_dgae')
 
+    def _get_order_lines(self):
+        lines = []
+        for line in self.order_line:
+            if not line.official_price:
+                lines.append({
+                    "nbColis": line.product_uom_qty,
+                    "contenant": line.contenant_id.name,
+                    "description": line.name,
+                    "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
+                    "codeTarif": line.product_id.categ_id.code_revatua,
+                    "stockage": "CALE",
+                    "poids": line.poids,
+                    "unitePoids": line.unite_poids.code_revatua,
+                    "volume": line.volume,
+                    "uniteVolume": line.unite_volume.code_revatua,
+                    "montantLibre": line.price_subtotal,
+                    "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
+                })
+            else:
+                lines.append({
+                    "nbColis": line.product_uom_qty,
+                    "contenant": line.contenant_id.name,
+                    "description": line.name,
+                    "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
+                    "codeTarif": line.product_id.categ_id.code_revatua,
+                    "stockage": "CALE",
+                    "poids": line.poids,
+                    "unitePoids": line.unite_poids.code_revatua,
+                    "volume": line.volume,
+                    "uniteVolume": line.unite_volume.code_revatua,
+                    "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
+                })
+
+        return lines
+
+    def _get_expediteur(self):
+        expediteur = {}
+        for order in self:
+            expediteur['denomination'] = order.partner_id.name
+            if order.partner_id.mobile or order.partner_id.phone:
+                expediteur['telephone'] = order.partner_id.mobile or order.partner_id.phone
+            if order.partner_id.email:
+                expediteur['mail'] = order.partner_id.email
+            if order.partner_id.vat:
+                expediteur['numeroTahiti'] = order.partner_id.vat
+        return expediteur
+
+    def _get_destinataire(self):
+        destinataire = {}
+        for order in self:
+            destinataire['denomination'] = order.partner_shipping_id.name
+            if order.partner_shipping_id.mobile or order.partner_shipping_id.phone:
+                destinataire['telephone'] = order.partner_shipping_id.mobile or order.partner_shipping_id.phone
+            if order.partner_shipping_id.email:
+                destinataire['mail'] = order.partner_shipping_id.email
+            if order.partner_shipping_id.vat:
+                destinataire['numeroTahiti'] = order.partner_shipping_id.vat
+        return destinataire
+
+    def action_confirm(self):
+        for order in self:
+            expediteur = order._get_expediteur()
+            destinataire = order._get_destinataire()
+            lines = order._get_order_lines()
+            nbrcolis = 0.0
+            for line in lines:
+                nbrcolis = nbrcolis + line['nbColis']
+            # nbrcolis = sum(d['nbColis'] for d in lines.values() if d)
+            if order.type_facturation == 'expediteur':
+                paiement = "EXPEDITEUR"
+            elif order.type_facturation == 'destinataire':
+                paiement = "DESTINATAIRE"
+            payload = {
+                "numeroVoyage": order.voyage_id.name,
+                "paiement": paiement,
+                "ileDepart": order.iledepart_id.name,
+                "ileArrivee": order.ilearrivee_id.name,
+                "expediteur": expediteur,
+                "destinataire": destinataire,
+                # "nombreColisAEmbarquer": nbrcolis,
+                "detailConnaissementDTO": lines,
+            }
+            order_response = order.env['revatua.api'].api_post("connaissements", payload)
+            order.id_revatua = order_response.json()["id"]
+            # Confirmation dans Revatua
+            url = "connaissements/" + order.id_revatua + "/changeretat"
+            payload2 = {
+                "evenementConnaissementEnum": "OFFICIALISE"
+            }
+            order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+            order.revatua_code = order_confirm.json()["numero"]
+
+            res = super(SaleOrder, self).action_confirm()
+            return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -95,6 +192,7 @@ class SaleOrderLine(models.Model):
     unit_compute = fields.Boolean(string='Unit Compute',
                                   default=False,
                                   help='On coche quand on veut un calcul unitaire')
+    official_price = fields.Boolean(string='Official Price', default=False)
 
     @api.onchange('unit_compute')
     def compute_unit_price(self):
@@ -145,6 +243,9 @@ class SaleOrderLine(models.Model):
             # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
             pricevolume = price * self.volume
             priceweight = price * self.poids / 1000
+
+            # on tague le champ official price
+            self.official_price = pricelistitems and pricelistitems[0].official_price
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:

@@ -39,3 +39,4 @@ class PricelistItem(models.Model):
     ile2_id = fields.Many2one(comodel_name='res.country.state',
                               domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                               string='Ile 2', help='Select the Ile 2')
+    official_price = fields.Boolean(string='Official Price', default=False)
