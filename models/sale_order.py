@@ -27,7 +27,8 @@ class SaleOrder(models.Model):
     type_facturation = fields.Selection([
         ('expediteur', 'Fret sur l\'expéditeur'),
         ('destinataire', 'Fret sur le destinataire'),
-        ('dgae', 'La DGAE')
+        ('dgae', 'La DGAE'),
+        ('aventure', 'En Aventure')
     ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
     revatua_code = fields.Char(string='Code Revatua', size=64,)
     id_revatua = fields.Char(string='ID Revatua', size=64,)
@@ -147,7 +148,11 @@ class SaleOrder(models.Model):
             if order.type_facturation == 'expediteur':
                 paiement = "EXPEDITEUR"
             elif order.type_facturation == 'destinataire':
-                paiement = "DESTINATAIRE"
+                paiement = "FAD"
+            elif order.type_facturation == 'dgae':
+                paiement = "DGAE"
+            elif order.type_facturation == 'aventure':
+                paiement = "AVENTURE"
             payload = {
                 "numeroVoyage": order.voyage_id.name,
                 "paiement": paiement,
