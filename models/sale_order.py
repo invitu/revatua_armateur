@@ -30,9 +30,9 @@ class SaleOrder(models.Model):
         ('dgae', 'La DGAE'),
         ('aventure', 'En Aventure')
     ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
-    revatua_code = fields.Char(string='Code Revatua', size=64,)
-    id_revatua = fields.Char(string='ID Revatua', size=64,)
-    version = fields.Char(string='Revatua Version', size=64,)
+    revatua_code = fields.Char(string='Code Revatua', size=64, copy=False)
+    id_revatua = fields.Char(string='ID Revatua', size=64, copy=False)
+    version = fields.Char(string='Revatua Version', size=64, copy=False)
 
     def order_is_not_fret(self):
         if self.type_id == self.env.ref('fret.sale.type'):
