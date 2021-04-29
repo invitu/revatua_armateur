@@ -186,6 +186,12 @@ class SaleOrder(models.Model):
                 'res_id': order.id,
                 'mimetype': 'application/pdf'
             })
+            # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
+            order.client_order_ref = "Connaissement n°" + order.revatua_code +\
+                " - Expéditeur: " + order.partner_id.name +\
+                " - Destinataire: " + order.partner_shipping_id.name +\
+                " - " + order.iledepart_id.name + "/" + order.ilearrivee_id.name +\
+                " - Voyage: " + order.voyage_id.display_name
 
             res = super(SaleOrder, self).action_confirm()
             return res
