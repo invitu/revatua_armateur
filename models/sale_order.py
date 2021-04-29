@@ -4,6 +4,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from datetime import datetime
+import base64
 
 
 class SaleOrder(models.Model):
@@ -129,6 +130,11 @@ class SaleOrder(models.Model):
                 destinataire['numeroTahiti'] = order.partner_shipping_id.vat
         return destinataire
 
+    def _get_pdf(self, order, event):
+        url = "connaissements/" + str(order) + "/pdf/" + str(event)
+        pdf = self.env['revatua.api'].api_get(url)
+        return pdf.content
+
     def action_confirm(self):
         for order in self:
             expediteur = order._get_expediteur()
@@ -162,6 +168,19 @@ class SaleOrder(models.Model):
             }
             order_confirm = order.env['revatua.api'].api_patch(url, payload2)
             order.revatua_code = order_confirm.json()["numero"]
+            # recup pdf
+            # on recupere l'evenement officialisé
+            event_id = order_confirm.json()["dernierEtatOfficialise"]["id"]
+            pdf_name = order_confirm.json()["dernierEtatOfficialise"]["nomFichier"]
+            pdf = order._get_pdf(order.id_revatua, event_id)
+            self.env['ir.attachment'].create({
+                'name': pdf_name,
+                'type': 'binary',
+                'datas': base64.b64encode(pdf),
+                'res_model': 'sale.order',
+                'res_id': order.id,
+                'mimetype': 'application/pdf'
+            })
 
             res = super(SaleOrder, self).action_confirm()
             return res
