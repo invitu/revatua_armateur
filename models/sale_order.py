@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError
 from datetime import datetime
 import base64
@@ -247,6 +247,7 @@ class SaleOrderLine(models.Model):
         if self.order_id.pricelist_id.type == 'fret' and self.product_id:
             date = self.order_id.validity_date or self.order_id.date_order or self._context.get('date') or fields.Datetime.now()
             vals = {}
+            discount = 0.0
             iles_ids = (self.order_id.iledepart_id.id, self.order_id.ilearrivee_id.id)
             # on cherche le prix dans la priicelist
             # on shunte la méthode originale et on réécrit dans le contexte Fret
@@ -269,20 +270,72 @@ class SaleOrderLine(models.Model):
 
             item_ids = [x[0] for x in self.env.cr.fetchall()]
             pricelistitems = self.env['product.pricelist.item'].browse(item_ids)
+            if pricelistitems:
+                pricelistitem_id = pricelistitems[0]
             # Ici on considère qu'on a qu'un seul résultat et que le prix est en mode fixed price...etc... bref, on est vraiment dans du specifique
-            price = pricelistitems and pricelistitems[0].fixed_price or 0.0
+            # On gère le rule.base == pricelist
+            if pricelistitems and pricelistitem_id.base == 'pricelist':
+                # On récupère les items de la list dépendante
+                base_pricelist_id = pricelistitem_id.base_pricelist_id.id
+                self.env.cr.execute(
+                    """
+                    SELECT
+                    item.id
+                    FROM
+                    product_pricelist_item AS item
+                    WHERE
+                    (item.pricelist_id = %s)
+                    AND (item.categ_id = %s)
+                    AND (item.date_start IS NULL OR item.date_start<=%s)
+                    AND (item.date_end IS NULL OR item.date_end>=%s)
+                    AND (item.ile1_id in %s)
+                    AND (item.ile2_id in %s)
+                    """,
+                    (base_pricelist_id, self.product_id.categ_id.id, date, date, iles_ids, iles_ids)
+                )
+                item_tmp_ids = [x[0] for x in self.env.cr.fetchall()]
+                pricelistitems_tmp = self.env['product.pricelist.item'].browse(item_tmp_ids)
+                # on calcule le prix avec la liste dépendante (une seule dépendance possible)
+                pricetmp = pricelistitems_tmp[0].fixed_price or 0.0
+                # on calcule le prix définitif avec la formule
+                price_limit = pricetmp
+                price = (pricetmp - (pricetmp * (pricelistitem_id.price_discount / 100))) or 0.0
+                if pricelistitem_id.price_round:
+                    price = tools.float_round(price, precision_rounding=pricelistitem_id.price_round)
+
+                if pricelistitem_id.price_surcharge:
+                    price_surcharge = pricelistitem_id.price_surcharge
+                    price += price_surcharge
+
+                if pricelistitem_id.price_min_margin:
+                    price_min_margin = pricelistitem_id.price_min_margin
+                    price = max(price, price_limit + price_min_margin)
+
+                if pricelistitem_id.price_max_margin:
+                    price_max_margin = pricelistitem_id.price_max_margin
+                    price = min(price, price_limit + price_max_margin)
+
+                if pricelistitem_id.pricelist_id.discount_policy == 'without_discount' and pricetmp:
+                    discount = max(0, (pricetmp - price) * 100 / pricetmp)
+                    price = pricetmp
+
+            elif pricelistitems and pricelistitem_id.fixed_price:
+                price = pricelistitem_id.fixed_price
+            else:
+                price = 0.0
             # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
             pricevolume = price * self.volume
             priceweight = price * self.poids / 1000
 
             # on tague le champ official price
-            vals['official_price'] = pricelistitems and pricelistitems[0].official_price
+            vals['official_price'] = pricelistitems and pricelistitem_id.official_price
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
                 vals['price_unit'] = max(pricevolume, priceweight)
             elif not self.unit_compute:
                 vals['price_unit'] = max(pricevolume, priceweight)/self.product_uom_qty
+            vals['discount'] = discount
             self.update(vals)
         return res
 
