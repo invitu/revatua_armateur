@@ -24,6 +24,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
     'data': [
         #'security/revatua_security.xml',
         'security/ir.model.access.csv',
+        'data/fret_minimum.xml',
         'data/sale_order_type_data.xml',
         'data/product.category.csv',
         'views/sale_order_views.xml',

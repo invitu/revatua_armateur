@@ -225,21 +225,13 @@ class SaleOrderLine(models.Model):
                                     readonly=True,
                                     default=False)
 
-    @api.onchange('unit_compute')
-    def compute_unit_price(self):
-        if not self.unit_compute:
-            new_price_unit = self.price_unit / self.product_uom_qty
-        elif self.unit_compute:
-            new_price_unit = self.price_unit * self.product_uom_qty
-        self.update({'price_unit': new_price_unit})
-
     @api.onchange('contenant_id')
     def contenant_id_change(self):
         if not self.contenant_id:
             return
         self.volume = self.contenant_id.volume
 
-    @api.onchange('product_id', 'volume', 'poids')
+    @api.onchange('product_id', 'volume', 'poids', 'unit_compute')
     def product_id_volume_poids_change(self):
         self.ensure_one()
         # Version a l'arrache complet... il faut faire gaffe !!!
@@ -248,6 +240,7 @@ class SaleOrderLine(models.Model):
             date = self.order_id.validity_date or self.order_id.date_order or self._context.get('date') or fields.Datetime.now()
             vals = {}
             discount = 0.0
+            minimum_fret_price = float(self.env['ir.config_parameter'].sudo().get_param('revatua_armateur.minimum_fret_price'))
             iles_ids = (self.order_id.iledepart_id.id, self.order_id.ilearrivee_id.id)
             # on cherche le prix dans la priicelist
             # on shunte la méthode originale et on réécrit dans le contexte Fret
@@ -332,9 +325,9 @@ class SaleOrderLine(models.Model):
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
-                vals['price_unit'] = max(pricevolume, priceweight)
+                vals['price_unit'] = max(pricevolume, priceweight, minimum_fret_price)
             elif not self.unit_compute:
-                vals['price_unit'] = max(pricevolume, priceweight)/self.product_uom_qty
+                vals['price_unit'] = max(max(pricevolume, priceweight)/self.product_uom_qty, minimum_fret_price)
             vals['discount'] = discount
             self.update(vals)
         return res

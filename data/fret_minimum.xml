@@ -1,0 +1,8 @@
+<odoo>
+    <data noupdate="1">
+        <record id="minimum_fret_price" model="ir.config_parameter">
+            <field name="key">revatua_armateur.minimum_fret_price</field>
+            <field name="value">609.0</field>
+        </record>
+    </data>
+</odoo>
