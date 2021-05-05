@@ -327,7 +327,7 @@ class SaleOrderLine(models.Model):
             if self.unit_compute:
                 vals['price_unit'] = max(pricevolume, priceweight, minimum_fret_price)
             elif not self.unit_compute:
-                vals['price_unit'] = max(max(pricevolume, priceweight)/self.product_uom_qty, minimum_fret_price)
+                vals['price_unit'] = max(max(pricevolume, priceweight)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
             vals['discount'] = discount
             self.update(vals)
         return res
