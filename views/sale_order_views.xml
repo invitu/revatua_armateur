@@ -64,9 +64,9 @@
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
                 <field name="unit_compute"/>
                 <field name="official_price" force_save="1"/>
-                <field name="longueur"/>
-                <field name="largeur"/>
-                <field name="hauteur"/>
+                <field name="longueur" attrs="{'invisible': [('unit_compute', '=', False)]}"/>
+                <field name="largeur" attrs="{'invisible': [('unit_compute', '=', False)]}"/>
+                <field name="hauteur" attrs="{'invisible': [('unit_compute', '=', False)]}"/>
                 <field name="volume"/>
                 <field name="poids"/>
             </xpath>
