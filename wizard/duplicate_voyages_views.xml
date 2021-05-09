@@ -21,7 +21,7 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
         <!-- TODO: check if we need this -->
-        <field name="binding_model_id" ref="revatua_connector.model_voyage" />
+        <field name="binding_model_id" ref="revatua_armateur.model_voyage" />
         <field name="binding_view_types">list</field>
     </record>
 

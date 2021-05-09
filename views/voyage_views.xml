@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<odoo>
+    <!--VUES GESTION-->
+    <!--VUES VOYAGE-->
+    <record model="ir.ui.view" id="view_revatua_voyage_form">
+        <field name="name">revatua_connector.voyage.form</field>
+        <field name="model">voyage</field>
+        <field name="arch" type="xml">
+            <form string="Voyage">
+                <header>
+                    <button name="action_confirm" id="action_confirm"
+                        string="Confirm" class="btn-primary" type="object"
+                        attrs="{'invisible': [('state', 'in', ['confirm'])]}"/>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_cancel" id="action_cancel"
+                        string="Cancel" type="object"
+                        attrs="{'invisible': [('state', 'in', ['cancel'])]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1> 
+                    </div>
+                    <group>
+                        <field name="navire_id"/>
+                        <field name="date_depart"/>
+                        <field name="date_arrivee"/>
+                        <field name="ile_depart_id"/>
+                        <field name="ile_arrivee_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Trajets" name="voyage_communication">
+                            <field name="trajet_ids" widget="section_and_note_one2many" mode="tree,kanban">
+                                <form>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="date_depart"/>
+                                        <field name="ile_depart_id"/>
+                                        <field name="lieu_depart_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="date_arrivee"/>
+                                        <field name="ile_arrivee_id"/>
+                                        <field name="lieu_arrivee_id"/>
+                                    </group>
+                                </form>
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date_depart"/>
+                                    <field name="ile_depart_id"/>
+                                    <field name="lieu_depart_id"/>
+                                    <field name="date_arrivee"/>
+                                    <field name="ile_arrivee_id"/>
+                                    <field name="lieu_arrivee_id"/>
+                                </tree>
+                                <kanban class="o_kanban_mobile" sample="1">
+                                    <field name="name"/>
+                                    <field name="date_depart"/>
+                                    <field name="ile_depart_id"/>
+                                    <field name="lieu_depart_id"/>
+                                    <field name="date_arrivee"/>
+                                    <field name="ile_arrivee_id"/>
+                                    <field name="lieu_arrivee_id"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                <div class="o_kanban_record_top mb16">
+                                                    <div class="o_kanban_record_headings mt4">
+                                                        <strong class="o_kanban_record_title"><span><t t-esc="record.name.value"/></span></strong>
+                                                    </div>
+                                                    <strong><field name="ile_depart_id"/></strong>
+                                                </div>
+                                                <div class="o_kanban_record_bottom">
+                                                    <div class="oe_kanban_bottom_left text-muted">
+                                                        <span><t t-esc="record.ile_depart_id.value"/> <t t-esc="record.ile_arrivee_id.value"/></span>
+                                                    </div>
+                                                    <div class="oe_kanban_bottom_right">
+                                                        <field name="lieu_depart_id"/>
+                                                        <field name="lieu_arrivee_id"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form> 
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_revatua_voyage_tree">
+        <field name="name">revatua_connector.voyage.tree</field>
+        <field name="model">voyage</field>
+        <field name="arch" type="xml">
+            <tree string="Voyages">
+                <field name="name"/>
+                <field name="navire_id"/>
+                <field name="date_depart"/>
+                <field name="ile_depart_id"/>
+                <field name="date_arrivee" string="Retour"/>
+                <field name="annule"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_revatua_voyage_calendar">
+        <field name="name">revatua_connector.voyage.calendar</field>
+        <field name="model">voyage</field>
+        <field eval="3" name="priority"/>
+        <field name="arch" type="xml">
+            <calendar date_start="date_depart" date_stop="date_arrivee" string="Organisation de voyages" mode="month" event_limit="5">
+                <field name="name" />
+                <field name="ile_depart_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_revatua_voyage_kanban" model="ir.ui.view">
+        <field name="name">revatua_connector.voyage.kanban</field>
+        <field name="model">voyage</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="name"/>
+                <field name="navire_id"/>
+                <field name="date_depart"/>
+                <field name="ile_depart_id"/>
+                <field name="lieu_debarquement_depart_id"/>
+                <field name="date_arrivee"/>
+                <field name="ile_arrivee_id"/>
+                <field name="lieu_debarquement_arrivee_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong><span><t t-esc="record.name.value"/></span></strong>
+                                    <t t-esc="record.navire_id.value"/> 
+                                </div>
+                            </div>
+                            <t t-if="record.date_depart.value">
+                                <hr class="mt8 mb8"/>
+                                <t t-esc="record.date_depart.value"/> 
+                                <t t-esc="record.ile_depart_id.value"/>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="action_revatua_voyage_view">
+        <field name="name">Voyages</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">voyage</field>
+        <field name="view_mode">tree,form,calendar,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajouter un nouveau voyage
+            </p>
+        </field>
+    </record>
+
+    <record id="revatua_connector.menu_revatua_gestion" model="ir.ui.menu">
+        <field name="action" ref="revatua_armateur.action_revatua_voyage_view"/>
+    </record>
+
+    <record id="model_voyage_action_confirm" model="ir.actions.server">
+        <field name="name">Confirm Voyage</field>
+        <field name="model_id" ref="revatua_armateur.model_voyage"/>
+        <field name="binding_model_id" ref="revatua_armateur.model_voyage"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_confirm()</field>
+    </record>
+
+
+    <!--VUES CONFIGURATION-->
+
+    <!--NAVIRE-->
+    <record model="ir.ui.view" id="view_revatua_navire_form">
+        <field name="name">revatua_connector.navire.form</field>
+        <field name="model">navire</field>
+        <field name="arch" type="xml">
+            <form string="Navire">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Nom du navire"/>
+                        <h1><field name="name"/></h1> 
+                    </div>
+                    <group>
+                        <field name="abbreviation"/>
+                        <field name="vehicule_roulant"/>
+                        <field name="croisiere"/>
+                        <field name="id_revatua"/>
+                    </group>
+                </sheet>
+            </form> 
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_revatua_navire_tree">
+        <field name="name">revatua_connector.navire.tree</field>
+        <field name="model">navire</field>
+        <field name="arch" type="xml">
+            <tree string="Voyages">
+                <field name="name"/>
+                <field name="abbreviation"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_revatua_navire_view">
+        <field name="name">Navires</field>
+        <field name="res_model">navire</field>
+    </record>
+
+    <record id="revatua_connector.menu_revatua_navire" model="ir.ui.menu">
+        <field name="action" ref="action_revatua_navire_view"/>
+    </record>
+
+</odoo>
