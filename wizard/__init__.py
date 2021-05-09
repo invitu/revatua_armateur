@@ -2,3 +2,4 @@
 
 
 from . import product_price_list_revatua_update
+from . import duplicate_voyages

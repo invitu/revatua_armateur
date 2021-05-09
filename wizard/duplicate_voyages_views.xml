@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_duplicate_voyages" model="ir.ui.view">
+        <field name="name">Duplicate voyages</field>
+        <field name="model">duplicate.voyages</field>
+        <field name="arch" type="xml">
+            <form string="Duplicate voyages">
+                <span class="o_form_label">Warning: Enter the number of days you want to duplicate voyages to (ie 7 for 1 week, 14 for 2 weeks...). And Confirm</span>
+                <field name="deltadays"/>
+                <footer>
+                    <button string="Duplicate voyages" name="duplicate_voyages" type="object" default_focus="1" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_duplicate_voyages" model="ir.actions.act_window">
+        <field name="name">Duplicate voyages</field>
+        <field name="res_model">duplicate.voyages</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- TODO: check if we need this -->
+        <field name="binding_model_id" ref="revatua_connector.model_voyage" />
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>
