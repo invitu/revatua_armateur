@@ -18,10 +18,11 @@ class SaleOrder(models.Model):
 
     def write(self, values):
         res = super(SaleOrder, self).write(values)
-        if any(f in values.keys() for f in (
-                'partner_shipping_id', 'type_facturation', 'iledepart_id',
-                'ilearrivee_id', 'voyage_id', 'order_line'
-        )) and self.id_revatua and 'sale' in self.mapped('state'):
+        if self.type_id == self.env.ref('revatua_armateur.fret_sale_type')\
+                and any(f in values.keys() for f in (
+                    'partner_shipping_id', 'type_facturation', 'iledepart_id',
+                    'ilearrivee_id', 'voyage_id', 'order_line'
+                )) and self.id_revatua and 'sale' in self.mapped('state'):
             url = "connaissements/" + self.id_revatua
             payload = self.compute_payload()
             payload['version'] = self.version
@@ -209,7 +210,7 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for order in self:
-            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and not order.id_revatua:
                 payload = order.compute_payload()
                 order_response = order.env['revatua.api'].api_post("connaissements", payload)
                 order.id_revatua = order_response.json()["id"]
@@ -225,8 +226,42 @@ class SaleOrder(models.Model):
                 order.manage_pdf(order_confirm)
                 # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
                 order.manage_client_ref()
-        res = super(SaleOrder, self).action_confirm()
-        return res
+            elif order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
+                url = "connaissements/" + self.id_revatua
+                payload = self.compute_payload()
+                payload['version'] = self.version
+                order_response = self.env['revatua.api'].api_put(url, payload)
+                self.version = order_response.json()["version"]
+                # Confirmation dans Revatua
+                url = "connaissements/" + order.id_revatua + "/changeretat"
+                payload2 = {
+                    "evenementConnaissementEnum": "OFFICIALISE"
+                }
+                order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+                order.version = order_confirm.json()["version"]
+                # recup pdf
+                self.manage_pdf(order_response)
+                # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
+                self.manage_client_ref()
+        return super(SaleOrder, self).action_confirm()
+
+    def action_cancel(self):
+        for order in self:
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
+                url = "connaissements/" + order.id_revatua + "/changeretat"
+                payload = {
+                    "evenementConnaissementEnum": "ANNULE",
+                    "motif": "BLA"
+                }
+                order_confirm = order.env['revatua.api'].api_patch(url, payload)
+                order.version = order_confirm.json()["version"]
+        return super(SaleOrder, self).action_cancel()
+
+    def action_draft(self):
+        for order in self:
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
+                raise UserError(_("The order has been cancelled on revatua, we cannot go back to draft state. It's definitely dead."))
+        return super(SaleOrder, self).action_draft()
 
 
 class SaleOrderLine(models.Model):
