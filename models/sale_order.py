@@ -309,7 +309,7 @@ class SaleOrderLine(models.Model):
             return
         self.volume = self.contenant_id.volume
 
-    @api.onchange('product_id', 'volume', 'poids', 'unit_compute')
+    @api.onchange('product_id', 'volume', 'poids', 'unit_compute', 'product_uom_qty')
     def product_id_volume_poids_change(self):
         self.ensure_one()
         # Version a l'arrache complet... il faut faire gaffe !!!
