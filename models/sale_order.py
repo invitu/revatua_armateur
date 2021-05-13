@@ -15,6 +15,23 @@ class SaleOrder(models.Model):
         self.iledepart_id = self.partner_id.state_id or False
         self.ilearrivee_id = self.partner_shipping_id.state_id or False
 
+    def write(self, values):
+        res = super(SaleOrder, self).write(values)
+        if any(f in values.keys() for f in (
+                'partner_shipping_id', 'type_facturation', 'iledepart_id',
+                'ilearrivee_id', 'voyage_id', 'order_line'
+        )) and self.id_revatua and 'sale' in self.mapped('state'):
+            url = "connaissements/" + self.id_revatua
+            payload = self.compute_payload()
+            payload['version'] = self.version
+            order_response = self.env['revatua.api'].api_put(url, payload)
+            self.version = order_response.json()["version"]
+            # recup pdf
+            self.manage_pdf(order_response)
+            # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
+            self.manage_client_ref()
+        return res
+
     iledepart_id = fields.Many2one(comodel_name='res.country.state',
                                    string='Ile de Départ',
                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
@@ -137,35 +154,62 @@ class SaleOrder(models.Model):
         pdf = self.env['revatua.api'].api_get(url)
         return pdf.content
 
-    def action_confirm(self):
-        for order in self:
-            expediteur = order._get_expediteur()
-            destinataire = order._get_destinataire()
-            lines = order._get_order_lines()
-            nbrcolis = 0.0
-            for line in lines:
-                nbrcolis = nbrcolis + line['nbColis']
+    def compute_payload(self):
+        expediteur = self._get_expediteur()
+        destinataire = self._get_destinataire()
+        lines = self._get_order_lines()
+        nbrcolis = 0.0
+        for line in lines:
+            nbrcolis = nbrcolis + line['nbColis']
             # nbrcolis = sum(d['nbColis'] for d in lines.values() if d)
-            if order.type_facturation == 'expediteur':
+            if self.type_facturation == 'expediteur':
                 paiement = "EXPEDITEUR"
-            elif order.type_facturation == 'destinataire':
+            elif self.type_facturation == 'destinataire':
                 paiement = "FAD"
-            elif order.type_facturation == 'dgae':
+            elif self.type_facturation == 'dgae':
                 paiement = "DGAE"
-            elif order.type_facturation == 'aventure':
+            elif self.type_facturation == 'aventure':
                 paiement = "AVENTURE"
             payload = {
-                "numeroVoyage": order.voyage_id.name,
+                "numeroVoyage": self.voyage_id.name,
                 "paiement": paiement,
-                "ileDepart": order.iledepart_id.name,
-                "ileArrivee": order.ilearrivee_id.name,
+                "ileDepart": self.iledepart_id.name,
+                "ileArrivee": self.ilearrivee_id.name,
                 "expediteur": expediteur,
                 "destinataire": destinataire,
                 # "nombreColisAEmbarquer": nbrcolis,
                 "detailConnaissementDTO": lines,
             }
+            return payload
+
+    def manage_pdf(self, order_response):
+        # recup pdf
+        # on recupere l'evenement officialisé
+        event_id = order_response.json()["dernierEtatOfficialise"]["id"]
+        pdf_name = order_response.json()["dernierEtatOfficialise"]["nomFichier"]
+        pdf = self._get_pdf(self.id_revatua, event_id)
+        # on enregistre le pdf
+        # TODO : il faut faire un message avec PJ pour que ca parte au client
+        self.env['ir.attachment'].create({
+            'name': pdf_name,
+            'type': 'binary',
+            'datas': base64.b64encode(pdf),
+            'res_model': 'sale.order',
+            'res_id': self.id,
+            'mimetype': 'application/pdf'
+        })
+
+    def manage_client_ref(self):
+        self.client_order_ref = "Connaissement n°" + self.revatua_code +\
+            " - Expéditeur: " + self.partner_id.name +\
+            " - Destinataire: " + self.partner_shipping_id.name +\
+            " - " + self.iledepart_id.name + "/" + self.ilearrivee_id.name +\
+            " - Voyage: " + self.voyage_id.display_name
+
+    def action_confirm(self):
+        for order in self:
+            payload = order.compute_payload()
             order_response = order.env['revatua.api'].api_post("connaissements", payload)
-            order.version = order_response.json()["version"]
             order.id_revatua = order_response.json()["id"]
             # Confirmation dans Revatua
             url = "connaissements/" + order.id_revatua + "/changeretat"
@@ -173,27 +217,12 @@ class SaleOrder(models.Model):
                 "evenementConnaissementEnum": "OFFICIALISE"
             }
             order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+            order.version = order_confirm.json()["version"]
             order.revatua_code = order_confirm.json()["numero"]
             # recup pdf
-            # on recupere l'evenement officialisé
-            event_id = order_confirm.json()["dernierEtatOfficialise"]["id"]
-            pdf_name = order_confirm.json()["dernierEtatOfficialise"]["nomFichier"]
-            pdf = order._get_pdf(order.id_revatua, event_id)
-            self.env['ir.attachment'].create({
-                'name': pdf_name,
-                'type': 'binary',
-                'datas': base64.b64encode(pdf),
-                'res_model': 'sale.order',
-                'res_id': order.id,
-                'mimetype': 'application/pdf'
-            })
+            order.manage_pdf(order_confirm)
             # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
-            order.client_order_ref = "Connaissement n°" + order.revatua_code +\
-                " - Expéditeur: " + order.partner_id.name +\
-                " - Destinataire: " + order.partner_shipping_id.name +\
-                " - " + order.iledepart_id.name + "/" + order.ilearrivee_id.name +\
-                " - Voyage: " + order.voyage_id.display_name
-
+            order.manage_client_ref()
             res = super(SaleOrder, self).action_confirm()
             return res
 
