@@ -107,6 +107,8 @@ class SaleOrder(models.Model):
     def _get_expediteur(self):
         expediteur = {}
         for order in self:
+            if order.partner_id.company_type == 'company' and not order.partner_id.vat:
+                raise UserError(_("The expediteur is a company you must fill vat number."))
             expediteur['denomination'] = order.partner_id.name
             if order.partner_id.mobile or order.partner_id.phone:
                 expediteur['telephone'] = order.partner_id.mobile or order.partner_id.phone
@@ -119,6 +121,8 @@ class SaleOrder(models.Model):
     def _get_destinataire(self):
         destinataire = {}
         for order in self:
+            if order.partner_shipping_id.company_type == 'company' and not order.partner_shipping_id.vat:
+                raise UserError(_("The destinataire is a company you must fill vat number."))
             destinataire['denomination'] = order.partner_shipping_id.name
             if order.partner_shipping_id.mobile or order.partner_shipping_id.phone:
                 destinataire['telephone'] = order.partner_shipping_id.mobile or order.partner_shipping_id.phone
