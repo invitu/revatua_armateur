@@ -358,9 +358,9 @@ class SaleOrderLine(models.Model):
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
-                vals['price_unit'] = max(pricevolume, priceweight, minimum_fret_price)
+                vals['price_unit'] = max(pricevolume * self.product_uom_qty, priceweight * self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
             elif not self.unit_compute:
-                vals['price_unit'] = max(max(pricevolume, priceweight)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
+                vals['price_unit'] = max(max(pricevolume * self.product_uom_qty, priceweight * self.product_uom_qty)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
             vals['discount'] = discount
             self.update(vals)
         return res
