@@ -209,23 +209,24 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for order in self:
-            payload = order.compute_payload()
-            order_response = order.env['revatua.api'].api_post("connaissements", payload)
-            order.id_revatua = order_response.json()["id"]
-            # Confirmation dans Revatua
-            url = "connaissements/" + order.id_revatua + "/changeretat"
-            payload2 = {
-                "evenementConnaissementEnum": "OFFICIALISE"
-            }
-            order_confirm = order.env['revatua.api'].api_patch(url, payload2)
-            order.version = order_confirm.json()["version"]
-            order.revatua_code = order_confirm.json()["numero"]
-            # recup pdf
-            order.manage_pdf(order_confirm)
-            # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
-            order.manage_client_ref()
-            res = super(SaleOrder, self).action_confirm()
-            return res
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
+                payload = order.compute_payload()
+                order_response = order.env['revatua.api'].api_post("connaissements", payload)
+                order.id_revatua = order_response.json()["id"]
+                # Confirmation dans Revatua
+                url = "connaissements/" + order.id_revatua + "/changeretat"
+                payload2 = {
+                    "evenementConnaissementEnum": "OFFICIALISE"
+                }
+                order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+                order.version = order_confirm.json()["version"]
+                order.revatua_code = order_confirm.json()["numero"]
+                # recup pdf
+                order.manage_pdf(order_confirm)
+                # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
+                order.manage_client_ref()
+        res = super(SaleOrder, self).action_confirm()
+        return res
 
 
 class SaleOrderLine(models.Model):
