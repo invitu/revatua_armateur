@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools, _
+from odoo.tools.float_utils import float_round as round
 from odoo.exceptions import UserError
 from datetime import datetime
 import base64
@@ -257,6 +258,14 @@ class SaleOrderLine(models.Model):
     official_price = fields.Boolean(string='Official Price',
                                     readonly=True,
                                     default=False)
+
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
+    def _compute_amount(self):
+        res = super(SaleOrderLine, self)._compute_amount()
+        for line in self:
+            if line.order_id.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
+                line.price_subtotal = round(line.product_uom_qty * line.price_unit * (1 - (line.discount or 0.0 / 100.0)), precision_digits=0, rounding_method='DOWN')
+        return res
 
     @api.onchange('contenant_id')
     def contenant_id_change(self):
