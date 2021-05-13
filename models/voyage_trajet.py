@@ -13,10 +13,14 @@ class Trajet(models.Model):
     version = fields.Datetime(string='Version')
     id_revatua = fields.Integer(string='ID Revatua', help='ID Unique de trajet')
     date_depart = fields.Datetime(copy=True, string="Date/heure de départ")
-    ile_depart_id = fields.Many2one('res.country.state', copy=True, string='Ile de départ')
+    ile_depart_id = fields.Many2one('res.country.state', copy=True,
+                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
+                                    string='Ile de départ')
     lieu_depart_id = fields.Many2one('res.partner', copy=True, string='Lieu de départ')
     date_arrivee = fields.Datetime(copy=True, string="Date/heure d'arivée")
-    ile_arrivee_id = fields.Many2one('res.country.state', copy=True, string="Ile d'arivée")
+    ile_arrivee_id = fields.Many2one('res.country.state', copy=True,
+                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
+                                     string="Ile d'arivée")
     lieu_arrivee_id = fields.Many2one('res.partner', copy=True, string="Lieu d'arivée")
     voyage_id = fields.Many2one('voyage', string='Voyage',
                                 ondelete='cascade',
@@ -76,6 +80,7 @@ class Voyage(models.Model):
                                   help='Date de départ du premier trajet du voyage')
     ile_depart_id = fields.Many2one(comodel_name='res.country.state', string='Ile de départ',
                                     readonly=True,
+                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                     states={
                                         'draft': [('readonly', False)],
                                         'confirm': [('readonly', False)],
@@ -98,6 +103,7 @@ class Voyage(models.Model):
                                    help="Date d'arrivée du dernier trajet du voyage")
     ile_arrivee_id = fields.Many2one(comodel_name='res.country.state', string="Ile d'arrivee",
                                      readonly=True,
+                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                      states={
                                          'draft': [('readonly', False)],
                                          'confirm': [('readonly', False)],
