@@ -34,26 +34,35 @@ class SaleOrder(models.Model):
             self.manage_client_ref()
         return res
 
+    partner_invoice_id = fields.Many2one(tracking=True)
+    partner_shipping_id = fields.Many2one(tracking=True)
     iledepart_id = fields.Many2one(comodel_name='res.country.state',
                                    string='Ile de Départ',
+                                   tracking=True,
                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                    help='Île de départ (on sélectionne par défaut l\'île de l\'expéditeur)')
     ilearrivee_id = fields.Many2one(comodel_name='res.country.state',
                                     string='Ile d\'arrivée',
+                                    tracking=True,
                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
-    voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage', help='Choisissez le voyage')
+    voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage',
+                                tracking=True,
+                                help='Choisissez le voyage')
     type_facturation = fields.Selection([
         ('expediteur', 'Fret sur l\'expéditeur'),
         ('destinataire', 'Fret sur le destinataire'),
         ('dgae', 'La DGAE'),
         ('aventure', 'En Aventure')
-    ], string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
+    ],
+                                        tracking=3,
+                                        string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
     revatua_code = fields.Char(string='Code Revatua', size=64, copy=False,
                                readonly=True)
     id_revatua = fields.Char(string='ID Revatua', size=64, copy=False,
                              readonly=True)
     version = fields.Char(string='Revatua Version', size=64, copy=False,
+                          tracking=True,
                           readonly=True)
 
     def order_is_not_fret(self):
