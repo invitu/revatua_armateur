@@ -172,6 +172,7 @@ class Voyage(models.Model):
 
     def action_confirm(self):
         for voyage in self:
+            timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
             if not voyage.name:
                 periple = voyage._get_periple()
                 payload = {
@@ -181,10 +182,17 @@ class Voyage(models.Model):
                 voyage_response = voyage.env['revatua.api'].api_post("voyages", payload)
                 voyage.name = voyage_response.json()["numero"]
                 voyage.version = voyage_response.json()["version"]
-                voyage.date_depart = datetime.combine(
+                voyage.date_depart = timezone.localize(datetime.combine(
                     datetime.strptime(voyage_response.json()["dateDepart"], '%Y-%m-%d'),
                     datetime.strptime(voyage_response.json()["heureDepart"], '%H:%M:%S').time(),
-                )
+                )).astimezone(pytz.utc).replace(tzinfo=None)
+                voyage.date_arrivee = timezone.localize(datetime.combine(
+                    datetime.strptime(voyage_response.json()["dateRetour"], '%Y-%m-%d'),
+                    datetime.strptime(voyage_response.json()["heureRetour"], '%H:%M:%S').time(),
+                )).astimezone(pytz.utc).replace(tzinfo=None)
+                voyage.ile_depart_id = self.env['res.country.state'].search([
+                    ('name', '=', voyage_response.json()["ileDepart"])
+                ], limit=1).id
             else:
                 payload = {
                     "annule": False,
@@ -200,6 +208,7 @@ class Voyage(models.Model):
         self.state = 'cancel'
 
     def write(self, values):
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         res = super(Voyage, self).write(values)
         if self.name and values.get('trajet_ids'):
             periple = self._get_periple()
@@ -213,10 +222,14 @@ class Voyage(models.Model):
             url = 'voyages/' + self.name
             voyage_response = self.env['revatua.api'].api_put(url, payload)
             self.version = voyage_response.json()["version"]
-            self.date_depart = datetime.combine(
+            self.date_depart = timezone.localize(datetime.combine(
                 datetime.strptime(voyage_response.json()["dateDepart"], '%Y-%m-%d'),
                 datetime.strptime(voyage_response.json()["heureDepart"], '%H:%M:%S').time(),
-            )
+            )).astimezone(pytz.utc).replace(tzinfo=None)
+            self.date_arrivee = timezone.localize(datetime.combine(
+                datetime.strptime(voyage_response.json()["dateRetour"], '%Y-%m-%d'),
+                datetime.strptime(voyage_response.json()["heureRetour"], '%H:%M:%S').time(),
+            )).astimezone(pytz.utc).replace(tzinfo=None)
         return res
 
 
