@@ -101,26 +101,6 @@ class Voyage(models.Model):
                                        'confirm': [('readonly', False)],
                                    },
                                    help="Date d'arrivée du dernier trajet du voyage")
-    ile_arrivee_id = fields.Many2one(comodel_name='res.country.state', string="Ile d'arrivee",
-                                     readonly=True,
-                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
-                                     states={
-                                         'draft': [('readonly', False)],
-                                         'confirm': [('readonly', False)],
-                                     },
-                                     )
-    lieu_debarquement_arrivee_id = fields.Many2one(
-        comodel_name='res.partner', string="Lieu de debarquement pour l'arivée",
-        readonly=True,
-        states={
-            'draft': [('readonly', False)],
-            'confirm': [('readonly', False)],
-        },
-    )
-    numero_armateur = fields.Char(string='Numéro Armateur', help="Numérotation du voyage propre à l'armateur")
-    date_edition_avis_depart = fields.Date(string="Date d'édition de l'avis de départ")
-    armateur_id = fields.Many2one(comodel_name='armateur', string='Armateur')
-    annule = fields.Boolean(string='Annulé', help="L'indicateur d'annulation")
     trajet_ids = fields.One2many(
         comodel_name='trajet', inverse_name='voyage_id', string='Trajets',
         readonly=True,
@@ -130,7 +110,6 @@ class Voyage(models.Model):
             'confirm': [('readonly', False)],
         },
     )
-    date_dernier_maj = fields.Datetime(string='Date de MAJ')
 
     def name_get(self):
         result = []
@@ -231,33 +210,3 @@ class Voyage(models.Model):
                 datetime.strptime(voyage_response.json()["heureRetour"], '%H:%M:%S').time(),
             )).astimezone(pytz.utc).replace(tzinfo=None)
         return res
-
-
-class TrajetTemporaire(models.Model):
-    _name = 'trajet.temporaire'
-    _description = "Liste des périples constituant le voyage"
-
-    version = fields.Datetime(string='Version')
-    id_revatua = fields.Integer(string='ID', help='ID Unique de trajet')
-    date_depart = fields.Datetime(string="Date/heure d'arivée")
-    ile_depart_id = fields.Many2one(comodel_name='res.country.state', string='Ile de départ')
-    lieu_depart_id = fields.Many2one(comodel_name='res.partner', string='Lieu de départ')
-    date_arrivee = fields.Datetime(string="Date/heure d'arivée")
-    ile_arrivee_id = fields.Many2one(comodel_name='res.country.state', string="Ile d'arivée")
-    lieu_arrivee_id = fields.Many2one(comodel_name='res.partner', string="Lieu de l'arivée")
-
-
-class VoyageTemporaire(models.Model):
-    _name = 'voyage.temporaire'
-
-    version = fields.Char(string='Version', help="La version des données - pour gérer les problèmes de concurrence")
-    numero = fields.Char(string='Numéro de voyage', help='Le numéro de voyage, identifiant unique')
-    navire_id = fields.Many2one(comodel_name='navire', string='Navire')
-    date_depart = fields.Datetime(string='Date de depart', help='Date de départ du premier trajet du voyage')
-    ile_depart_id = fields.Many2one(comodel_name='res.country.state', string='Ile de départ')
-    lieu_debarquement_depart_id = fields.Many2one(comodel_name='res.partner', string='Lieu de debarquement pour le départ')
-    date_arrivee = fields.Datetime(string="Date d'arivée", help="Date d'arrivée du dernier trajet du voyage")
-    ile_arrivee_id = fields.Many2one(comodel_name='res.country.state', string="Ile d'arrivee")
-    lieu_debarquement_arrivee_id = fields.Many2one(comodel_name='res.partner')
-    periple_ids = fields.Many2many(comodel_name='trajet.temporaire', string='Periples')
-    anomalies = fields.Char(string='La liste des anomalies')

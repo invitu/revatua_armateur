@@ -26,7 +26,6 @@
                         <field name="date_depart"/>
                         <field name="date_arrivee"/>
                         <field name="ile_depart_id"/>
-                        <field name="ile_arrivee_id"/>
                     </group>
                     <notebook>
                         <page string="Trajets" name="voyage_communication">
@@ -106,7 +105,6 @@
                 <field name="date_depart"/>
                 <field name="ile_depart_id"/>
                 <field name="date_arrivee" string="Retour"/>
-                <field name="annule"/>
                 <field name="state" invisible="1"/>
             </tree>
         </field>
@@ -117,7 +115,7 @@
         <field name="model">voyage</field>
         <field eval="3" name="priority"/>
         <field name="arch" type="xml">
-            <calendar date_start="date_depart" date_stop="date_arrivee" string="Organisation de voyages" mode="month" event_limit="5">
+            <calendar date_start="date_depart" date_stop="date_arrivee" string="Organisation de voyages" mode="week" event_limit="5">
                 <field name="name" />
                 <field name="ile_depart_id"/>
             </calendar>
@@ -135,8 +133,6 @@
                 <field name="ile_depart_id"/>
                 <field name="lieu_debarquement_depart_id"/>
                 <field name="date_arrivee"/>
-                <field name="ile_arrivee_id"/>
-                <field name="lieu_debarquement_arrivee_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
