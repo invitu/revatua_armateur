@@ -115,9 +115,13 @@
         <field name="model">voyage</field>
         <field eval="3" name="priority"/>
         <field name="arch" type="xml">
-            <calendar date_start="date_depart" date_stop="date_arrivee" string="Organisation de voyages" mode="week" event_limit="5">
+            <calendar date_start="date_depart" date_stop="date_arrivee" string="Voyages" mode="week"
+                color="navire_id"
+                quick_add="False"
+                event_limit="5">
                 <field name="name" />
                 <field name="ile_depart_id"/>
+                <field name="navire_id" filters="1" invisible="1"/>
             </calendar>
         </field>
     </record>
