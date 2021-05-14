@@ -19,6 +19,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
         'l10n_pf_customs_nomenclature',
         'revatua_connector',
         'sale_order_type',
+        'web_domain_field',
     ],
 
     # always loaded

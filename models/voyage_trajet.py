@@ -116,7 +116,7 @@ class Voyage(models.Model):
         for voyage in self:
             date_depart = fields.Datetime.from_string(voyage.date_depart)
             if date_depart:
-                date = fields.Datetime.to_string(fields.Datetime.context_timestamp(voyage, date_depart))
+                date = fields.Datetime.context_timestamp(voyage, date_depart).strftime('%a %d/%m/%Y %H:%M')
             else:
                 date = '2021-01-01'
             print(date)

@@ -6,6 +6,7 @@ from odoo.tools.float_utils import float_round as round
 from odoo.exceptions import UserError
 from datetime import datetime
 import base64
+import json
 
 
 class SaleOrder(models.Model):
@@ -46,6 +47,7 @@ class SaleOrder(models.Model):
                                     tracking=True,
                                     domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
+    voyage_id_domain = fields.Char(compute="_compute_voyage_id_domain", readonly=True, store=False)
     voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage',
                                 tracking=True,
                                 help='Choisissez le voyage')
@@ -65,32 +67,26 @@ class SaleOrder(models.Model):
                           tracking=True,
                           readonly=True)
 
-    def order_is_not_fret(self):
-        if self.type_id == self.env.ref('fret.sale.type'):
-            return False
-        else:
-            return True
+    @api.depends('iledepart_id', 'ilearrivee_id')
+    def _compute_voyage_id_domain(self):
+        for order in self:
+            trajet_from_ids = self.env['trajet'].search([
+                ('ile_depart_id', '=', order.iledepart_id.id),
+                ('date_depart', '>', datetime.now()),
+            ]).ids
+            trajet_to_ids = self.env['trajet'].search([
+                ('ile_arrivee_id', '=', order.ilearrivee_id.id),
+                ('date_depart', '>', datetime.now()),
+            ]).ids
 
-    @api.onchange('iledepart_id', 'ilearrivee_id')
-    def set_domain_for_voyage(self):
-        trajet_from_ids = self.env['trajet'].search([
-            ('ile_depart_id', '=', self.iledepart_id.id),
-            ('date_depart', '>', datetime.now()),
-        ]).ids
-        trajet_to_ids = self.env['trajet'].search([
-            ('ile_arrivee_id', '=', self.ilearrivee_id.id),
-            ('date_depart', '>', datetime.now()),
-        ]).ids
-
-        voyage_list = self.env['voyage'].search([
-            ('trajet_ids', 'in', trajet_from_ids),
-            ('trajet_ids', 'in', trajet_to_ids),
-            ('state', '=', 'confirm'),
-        ]).ids
-
-        res = {}
-        res['domain'] = {'voyage_id': [('id', 'in', voyage_list)]}
-        return res
+            voyage_list = self.env['voyage'].search([
+                ('trajet_ids', 'in', trajet_from_ids),
+                ('trajet_ids', 'in', trajet_to_ids),
+                ('state', '=', 'confirm'),
+            ]).ids
+            order.voyage_id_domain = json.dumps(
+                [('id', 'in', voyage_list)]
+            )
 
     @api.onchange('type_facturation')
     def set_adresse_facturation(self):

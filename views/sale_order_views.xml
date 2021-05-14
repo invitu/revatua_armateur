@@ -47,7 +47,8 @@
                 <group name="fret_special" attrs="{'invisible': [('type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}">
                     <field name="iledepart_id"/>
                     <field name="ilearrivee_id"/>
-                    <field name="voyage_id"/>
+                    <field name="voyage_id_domain" invisible="1"/>
+                    <field name="voyage_id" domain="voyage_id_domain"/>
                     <field name="id_revatua"/>
                     <field name="revatua_code"/>
                 </group>
