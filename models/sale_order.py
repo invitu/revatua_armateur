@@ -271,6 +271,149 @@ class SaleOrder(models.Model):
                 raise UserError(_("The order has been cancelled on revatua, we cannot go back to draft state. It's definitely dead."))
         return super(SaleOrder, self).action_draft()
 
+    @api.model
+    def connaissement_sync(self):
+        connaissements = self._get_connaissements()
+
+        for conn in connaissements:
+            order_vals = {
+                'type_id': self.env.ref('revatua_armateur.fret_sale_type').id,
+                'id_revatua': conn['id'],
+                'revatua_code': conn['numero'],
+                'version': conn['version'],
+                'partner_id': self._set_expediteur(conn['expediteur']),
+                'partner_shipping_id': self._set_destinataire(conn['destinataire']),
+                'pricelist_id': self.env.ref('revatua_armateur.fretlist0').id,
+            }
+
+            if (conn['paiement'] == 'EXPEDITEUR'):
+                order_vals['type_facturation'] = 'expediteur'
+            elif (conn['paiement'] == 'FAD'):
+                order_vals['type_facturation'] = 'destinataire'
+            elif(conn['paiement'] == 'DGAE'):
+                order_vals['type_facturation'] = 'dgae'
+            elif(conn['paiement'] == 'AVENTURE'):
+                order_vals['type_facturation'] = 'aventure'
+
+            order_vals['iledepart_id'] = self.env['res.country.state'].search([
+                ('id_revatua', '=', conn['ileDepart']['id'])
+            ]).id
+
+            order_vals['ilearrivee_id'] = self.env['res.country.state'].search([
+                ('id_revatua', '=', conn['ileArrivee']['id'])
+            ]).id
+
+            order_vals['voyage_id'] = self.env['voyage'].search([
+                ('name', '=', conn['voyage']['numero'])
+            ]).id
+
+            # Create connaissement
+            new_order = self.create(order_vals)
+
+            for line in conn['detailConnaissements']:
+                # on crée le sale_order_line avant pour y appliquer la méthode de calcul des prix
+                line_values = self._prepare_sale_order_line(line)
+                line_values['order_id'] = new_order.id
+                new_line = self.env['sale.order.line'].create(line_values)
+                new_line.product_id_volume_poids_change()
+
+    def _get_connaissements(self):
+        url = "connaissements/demandes/armateurs"
+        connaissements = self.env['revatua.api'].api_get(url)
+
+        return json.loads(connaissements.content)["content"]
+
+    def _set_expediteur(self, values):
+        # on récupère l'expéditeur par priorité ou on crée un nouveau partner si inexistant
+        expediteur = None
+        if (values['numeroTahiti']):
+            expediteur = self.env['res.partner'].search([
+                ('vat', '=', values['numeroTahiti'])
+            ]).id
+
+        if (values['mail'] and not expediteur):
+            expediteur = self.env['res.partner'].search([
+                ('email', '=', values['mail'])
+            ]).id
+
+        if (values['telephone'] and not expediteur):
+            expediteur = self.env['res.partner'].search([
+                '|',
+                ('mobile', '=', values['telephone']),
+                ('phone', '=', values['telephone'])
+            ]).id
+
+        if (not expediteur):
+            expediteur = self.env['res.partner'].name_create(
+                values['denomination']
+            )[0]
+
+        return expediteur
+
+    def _set_destinataire(self, values):
+        # on récupère le destinataire par priorité ou on crée un nouveau partner si inexistant
+        destinataire = None
+        if (values['numeroTahiti']):
+            destinataire = self.env['res.partner'].search([
+                ('vat', '=', values['numeroTahiti'])
+            ]).id
+
+        if (values['mail'] and not destinataire):
+            destinataire = self.env['res.partner'].search([
+                ('email', '=', values['mail'])
+            ]).id
+
+        if (values['telephone'] and not destinataire):
+            destinataire = self.env['res.partner'].search([
+                '|',
+                ('mobile', '=', values['telephone']),
+                ('phone', '=', values['telephone'])
+            ]).id
+
+        if (not destinataire):
+            destinataire = self.env['res.partner'].name_create(
+                values['denomination']
+            )[0]
+
+        return destinataire
+
+    def _prepare_sale_order_line(self, values):
+        """
+        Prepare the dict of values to create the new sale order line for a detail connaissement.
+        """
+
+        res = {
+            'product_uom_qty': values['nbColis'],
+            'poids': values['poids'],
+            'volume': values['volume'],
+        }
+
+        if (values['codeSH']['nomenclature']):
+            product_id = self.env['product.product'].search([
+                ('nomenclaturepfcustoms_id.name',
+                 'like', values['codeSH']['nomenclature'])
+            ]).id
+            res['product_id'] = product_id
+
+        if (values['contenant']):
+            contenant = self.env['product.product'].search([
+                ('id_revatua', '=', values['contenant']['id'])
+            ]).id
+            res['contenant_id'] = contenant
+
+        if (values['uniteVolume']):
+            unite_volume = self.env['uom.uom'].search([
+                ('code_revatua', '=', values['uniteVolume'])
+            ]).id
+            res['unite_volume'] = unite_volume
+
+        if (values['unitePoids']):
+            unite_poids = self.env['uom.uom'].search([
+                ('code_revatua', '=', values['unitePoids'])
+            ]).id
+            res['unite_poids'] = unite_poids
+
+        return res
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
