@@ -40,14 +40,17 @@ class SaleOrder(models.Model):
     iledepart_id = fields.Many2one(comodel_name='res.country.state',
                                    string='Ile de Départ',
                                    tracking=True,
-                                   domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
+                                   domain=lambda self: [
+                                       ('country_id', '=', self.env.ref('base.pf').id)],
                                    help='Île de départ (on sélectionne par défaut l\'île de l\'expéditeur)')
     ilearrivee_id = fields.Many2one(comodel_name='res.country.state',
                                     string='Ile d\'arrivée',
                                     tracking=True,
-                                    domain=lambda self: [('country_id', '=', self.env.ref('base.pf').id)],
+                                    domain=lambda self: [
+                                        ('country_id', '=', self.env.ref('base.pf').id)],
                                     help='Île d\'arrivée (on sélectionne par défaut l\'île du destinataire)')
-    voyage_id_domain = fields.Char(compute="_compute_voyage_id_domain", readonly=True, store=False)
+    voyage_id_domain = fields.Char(
+        compute="_compute_voyage_id_domain", readonly=True, store=False)
     voyage_id = fields.Many2one(comodel_name='voyage', string='Voyage',
                                 tracking=True,
                                 help='Choisissez le voyage')
@@ -57,8 +60,8 @@ class SaleOrder(models.Model):
         ('dgae', 'La DGAE'),
         ('aventure', 'En Aventure')
     ],
-                                        tracking=3,
-                                        string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
+        tracking=3,
+        string='Qui est facturé ?', help='Sélectionnez le type de facturation', default='expediteur')
     revatua_code = fields.Char(string='Code Revatua', size=64, copy=False,
                                readonly=True)
     id_revatua = fields.Char(string='ID Revatua', size=64, copy=False,
@@ -105,7 +108,8 @@ class SaleOrder(models.Model):
             addr = self.partner_shipping_id.address_get(['invoice'])
             self.partner_invoice_id = addr['invoice']
         else:
-            self.partner_invoice_id = self.env.ref('revatua_connector.partner_dgae')
+            self.partner_invoice_id = self.env.ref(
+                'revatua_connector.partner_dgae')
 
     def _get_order_lines(self):
         lines = []
@@ -140,7 +144,8 @@ class SaleOrder(models.Model):
         expediteur = {}
         for order in self:
             if order.partner_id.company_type == 'company' and not order.partner_id.vat:
-                raise UserError(_("The expediteur is a company you must fill vat number."))
+                raise UserError(
+                    _("The expediteur is a company you must fill vat number."))
             expediteur['denomination'] = order.partner_id.name
             if order.partner_id.mobile or order.partner_id.phone:
                 expediteur['telephone'] = order.partner_id.mobile or order.partner_id.phone
@@ -154,7 +159,8 @@ class SaleOrder(models.Model):
         destinataire = {}
         for order in self:
             if order.partner_shipping_id.company_type == 'company' and not order.partner_shipping_id.vat:
-                raise UserError(_("The destinataire is a company you must fill vat number."))
+                raise UserError(
+                    _("The destinataire is a company you must fill vat number."))
             destinataire['denomination'] = order.partner_shipping_id.name
             if order.partner_shipping_id.mobile or order.partner_shipping_id.phone:
                 destinataire['telephone'] = order.partner_shipping_id.mobile or order.partner_shipping_id.phone
@@ -201,7 +207,8 @@ class SaleOrder(models.Model):
         # recup pdf
         # on recupere l'evenement officialisé
         event_id = order_response.json()["dernierEtatOfficialise"]["id"]
-        pdf_name = order_response.json()["dernierEtatOfficialise"]["nomFichier"]
+        pdf_name = order_response.json(
+        )["dernierEtatOfficialise"]["nomFichier"]
         pdf = self._get_pdf(self.id_revatua, event_id)
         # on enregistre le pdf
         # TODO : il faut faire un message avec PJ pour que ca parte au client
@@ -225,14 +232,16 @@ class SaleOrder(models.Model):
         for order in self:
             if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and not order.id_revatua:
                 payload = order.compute_payload()
-                order_response = order.env['revatua.api'].api_post("connaissements", payload)
+                order_response = order.env['revatua.api'].api_post(
+                    "connaissements", payload)
                 order.id_revatua = order_response.json()["id"]
                 # Confirmation dans Revatua
                 url = "connaissements/" + order.id_revatua + "/changeretat"
                 payload2 = {
                     "evenementConnaissementEnum": "OFFICIALISE"
                 }
-                order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+                order_confirm = order.env['revatua.api'].api_patch(
+                    url, payload2)
                 order.version = order_confirm.json()["version"]
                 order.revatua_code = order_confirm.json()["numero"]
                 # recup pdf
@@ -245,7 +254,8 @@ class SaleOrder(models.Model):
                 payload2 = {
                     "evenementConnaissementEnum": "OFFICIALISE"
                 }
-                order_confirm = order.env['revatua.api'].api_patch(url, payload2)
+                order_confirm = order.env['revatua.api'].api_patch(
+                    url, payload2)
                 order.version = order_confirm.json()["version"]
                 # recup pdf
                 self.manage_pdf(order_confirm)
@@ -261,14 +271,16 @@ class SaleOrder(models.Model):
                     "evenementConnaissementEnum": "ANNULE",
                     "motif": "BLA"
                 }
-                order_confirm = order.env['revatua.api'].api_patch(url, payload)
+                order_confirm = order.env['revatua.api'].api_patch(
+                    url, payload)
                 order.version = order_confirm.json()["version"]
         return super(SaleOrder, self).action_cancel()
 
     def action_draft(self):
         for order in self:
             if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
-                raise UserError(_("The order has been cancelled on revatua, we cannot go back to draft state. It's definitely dead."))
+                raise UserError(
+                    _("The order has been cancelled on revatua, we cannot go back to draft state. It's definitely dead."))
         return super(SaleOrder, self).action_draft()
 
     @api.model
@@ -316,7 +328,7 @@ class SaleOrder(models.Model):
                 line_values['order_id'] = new_order.id
                 new_line = self.env['sale.order.line'].create(line_values)
                 new_line.product_id_volume_poids_change()
-                
+
             # Confirmation dans Revatua
             url = "connaissements/" + str(conn['id']) + "/changeretat"
             payload = {
@@ -424,6 +436,7 @@ class SaleOrder(models.Model):
 
         return res
 
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -435,16 +448,20 @@ class SaleOrderLine(models.Model):
                                    string="Unité de volume",
                                    groups="revatua_connector.group_revatua_user",
                                    readonly=True,
-                                   default=lambda self: self.env.ref('uom.product_uom_cubic_meter'),
+                                   default=lambda self: self.env.ref(
+                                       'uom.product_uom_cubic_meter'),
                                    domain=lambda self: [('category_id', '=', self.env.ref('uom.product_uom_categ_vol').id)])
     unite_poids = fields.Many2one(comodel_name='uom.uom',
                                   string="Unité de poids",
                                   groups="revatua_connector.group_revatua_user",
                                   readonly=True,
-                                  default=lambda self: self.env.ref('uom.product_uom_kgm'),
+                                  default=lambda self: self.env.ref(
+                                      'uom.product_uom_kgm'),
                                   domain=lambda self: [('category_id', '=', self.env.ref('uom.product_uom_categ_kgm').id)])
-    volume = fields.Float(string='Volume', digits='Volume', help='Volume is computed from dimensions but can be overwritten')
-    poids = fields.Float(string='Poids', digits='Stock Weight', help='Weight is always in kg')
+    volume = fields.Float(string='Volume', digits='Volume',
+                          help='Volume is computed from dimensions but can be overwritten')
+    poids = fields.Float(string='Poids', digits='Stock Weight',
+                         help='Weight is always in kg')
     longueur = fields.Integer(string="Longueur", help='Longueur en cm')
     largeur = fields.Integer(string="Largeur", help='Largeur en cm')
     hauteur = fields.Integer(string="Hauteur", help='Hauteur en cm')
@@ -460,7 +477,8 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self)._compute_amount()
         for line in self:
             if line.order_id.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
-                line.price_subtotal = round(line.product_uom_qty * line.price_unit * (1 - (line.discount or 0.0 / 100.0)), precision_digits=0, rounding_method='DOWN')
+                line.price_subtotal = round(line.product_uom_qty * line.price_unit * (
+                    1 - (line.discount or 0.0 / 100.0)), precision_digits=0, rounding_method='DOWN')
         return res
 
     @api.onchange('contenant_id')
@@ -475,11 +493,14 @@ class SaleOrderLine(models.Model):
         # Version a l'arrache complet... il faut faire gaffe !!!
         res = super(SaleOrderLine, self).product_id_change()
         if self.order_id.pricelist_id.type == 'fret' and self.product_id:
-            date = self.order_id.validity_date or self.order_id.date_order or self._context.get('date') or fields.Datetime.now()
+            date = self.order_id.validity_date or self.order_id.date_order or self._context.get(
+                'date') or fields.Datetime.now()
             vals = {}
             discount = 0.0
-            minimum_fret_price = float(self.env['ir.config_parameter'].sudo().get_param('revatua_armateur.minimum_fret_price'))
-            iles_ids = (self.order_id.iledepart_id.id, self.order_id.ilearrivee_id.id)
+            minimum_fret_price = float(self.env['ir.config_parameter'].sudo(
+            ).get_param('revatua_armateur.minimum_fret_price'))
+            iles_ids = (self.order_id.iledepart_id.id,
+                        self.order_id.ilearrivee_id.id)
             # on cherche le prix dans la priicelist
             # on shunte la méthode originale et on réécrit dans le contexte Fret
             self.env.cr.execute(
@@ -496,11 +517,13 @@ class SaleOrderLine(models.Model):
                     AND (item.ile1_id in %s)
                     AND (item.ile2_id in %s)
                 """,
-                (self.order_id.pricelist_id.id, self.product_id.categ_id.id, date, date, iles_ids, iles_ids)
+                (self.order_id.pricelist_id.id, self.product_id.categ_id.id,
+                 date, date, iles_ids, iles_ids)
             )
 
             item_ids = [x[0] for x in self.env.cr.fetchall()]
-            pricelistitems = self.env['product.pricelist.item'].browse(item_ids)
+            pricelistitems = self.env['product.pricelist.item'].browse(
+                item_ids)
             if pricelistitems:
                 pricelistitem_id = pricelistitems[0]
             # Ici on considère qu'on a qu'un seul résultat et que le prix est en mode fixed price...etc... bref, on est vraiment dans du specifique
@@ -522,17 +545,21 @@ class SaleOrderLine(models.Model):
                     AND (item.ile1_id in %s)
                     AND (item.ile2_id in %s)
                     """,
-                    (base_pricelist_id, self.product_id.categ_id.id, date, date, iles_ids, iles_ids)
+                    (base_pricelist_id, self.product_id.categ_id.id,
+                     date, date, iles_ids, iles_ids)
                 )
                 item_tmp_ids = [x[0] for x in self.env.cr.fetchall()]
-                pricelistitems_tmp = self.env['product.pricelist.item'].browse(item_tmp_ids)
+                pricelistitems_tmp = self.env['product.pricelist.item'].browse(
+                    item_tmp_ids)
                 # on calcule le prix avec la liste dépendante (une seule dépendance possible)
                 pricetmp = pricelistitems_tmp[0].fixed_price or 0.0
                 # on calcule le prix définitif avec la formule
                 price_limit = pricetmp
-                price = (pricetmp - (pricetmp * (pricelistitem_id.price_discount / 100))) or 0.0
+                price = (pricetmp - (pricetmp *
+                         (pricelistitem_id.price_discount / 100))) or 0.0
                 if pricelistitem_id.price_round:
-                    price = tools.float_round(price, precision_rounding=pricelistitem_id.price_round)
+                    price = tools.float_round(
+                        price, precision_rounding=pricelistitem_id.price_round)
 
                 if pricelistitem_id.price_surcharge:
                     price_surcharge = pricelistitem_id.price_surcharge
@@ -563,9 +590,11 @@ class SaleOrderLine(models.Model):
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
-                vals['price_unit'] = max(pricevolume * self.product_uom_qty, priceweight * self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
+                vals['price_unit'] = max(pricevolume * self.product_uom_qty, priceweight *
+                                         self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
             elif not self.unit_compute:
-                vals['price_unit'] = max(max(pricevolume * self.product_uom_qty, priceweight * self.product_uom_qty)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
+                vals['price_unit'] = max(max(pricevolume * self.product_uom_qty, priceweight *
+                                         self.product_uom_qty)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
             vals['discount'] = discount
             self.update(vals)
         return res
