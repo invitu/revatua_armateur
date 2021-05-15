@@ -316,6 +316,15 @@ class SaleOrder(models.Model):
                 line_values['order_id'] = new_order.id
                 new_line = self.env['sale.order.line'].create(line_values)
                 new_line.product_id_volume_poids_change()
+                
+            # Confirmation dans Revatua
+            url = "connaissements/" + str(conn['id']) + "/changeretat"
+            payload = {
+                "evenementConnaissementEnum": "OFFICIALISE_SOUS_RESERVE"
+            }
+            order_confirm = self.env['revatua.api'].api_patch(
+                url, payload)
+            new_order.version = order_confirm.json()["version"]
 
     def _get_connaissements(self):
         url = "connaissements/demandes/armateurs"
