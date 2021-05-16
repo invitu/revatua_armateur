@@ -111,7 +111,7 @@ class SaleOrder(models.Model):
                 volumetotal = line.volume
             datas = {
                 "nbColis": line.product_uom_qty,
-                "contenant": line.contenant_id.name,
+                "contenant": line.contenant_id.name or 'false',
                 "description": line.name,
                 "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
                 "codeTarif": line.product_id.categ_id.code_revatua,
@@ -232,11 +232,6 @@ class SaleOrder(models.Model):
                 # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
                 order.manage_client_ref()
             elif order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
-                url = "connaissements/" + self.id_revatua
-                payload = self.compute_payload()
-                payload['version'] = self.version
-                order_response = self.env['revatua.api'].api_put(url, payload)
-                self.version = order_response.json()["version"]
                 # Confirmation dans Revatua
                 url = "connaissements/" + order.id_revatua + "/changeretat"
                 payload2 = {
@@ -245,7 +240,7 @@ class SaleOrder(models.Model):
                 order_confirm = order.env['revatua.api'].api_patch(url, payload2)
                 order.version = order_confirm.json()["version"]
                 # recup pdf
-                self.manage_pdf(order_response)
+                self.manage_pdf(order_confirm)
                 # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
                 self.manage_client_ref()
         return super(SaleOrder, self).action_confirm()
