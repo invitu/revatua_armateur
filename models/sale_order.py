@@ -324,6 +324,14 @@ class SaleOrder(models.Model):
 
             for line in conn['detailConnaissements']:
                 # on crée le sale_order_line avant pour y appliquer la méthode de calcul des prix
+                # on check les inconsistences de product (correspondance categ et codesh)
+                # si on a une inconsistence, on cree une ligne commentaire
+                line_values = self._check_product_categ_codesh(line)
+                if line_values:
+                    line_values['order_id'] = new_order.id
+                    new_line = self.env['sale.order.line'].create(line_values)
+                    line_values = {}
+                # si on a une ligne de data, on continue le traitement
                 line_values = self._prepare_sale_order_line(line)
                 line_values['order_id'] = new_order.id
                 new_line = self.env['sale.order.line'].create(line_values)
@@ -397,6 +405,29 @@ class SaleOrder(models.Model):
             )[0]
 
         return destinataire
+
+    def _check_product_categ_codesh(self, values):
+        """
+        Check inconsistence between product, categ_id and codesh.
+        Returns a comment order line if it's not consistent
+        """
+        res = {}
+        product_ids = self.env['product.product'].search([
+            ('nomenclaturepfcustoms_id.name',
+             'like', values['codeSH']['nomenclature']),
+            ('categ_id.code_revatua',
+             '=', values['codeTarif']['code']),
+        ])
+        # S'il n'y a aucun produit qui match, on renvoie un commentaire
+        if not product_ids:
+            res['display_type'] = 'line_note'
+            res['name'] = _('ATTENTION Received data is wrong : designation %(product)s is received with nomenclature %(codesh)s(%(codeshname)s) and category %(categ)s.',
+                            product=values['description'],
+                            codesh=values['codeSH']['nomenclature'],
+                            codeshname=values['codeSH']['libelle'],
+                            categ=values['codeTarif']['libelle'],
+                            )
+        return res
 
     def _prepare_sale_order_line(self, values):
         """
