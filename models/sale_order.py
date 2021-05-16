@@ -295,7 +295,6 @@ class SaleOrder(models.Model):
                 'version': conn['version'],
                 'partner_id': self._set_expediteur(conn['expediteur']),
                 'partner_shipping_id': self._set_destinataire(conn['destinataire']),
-                'pricelist_id': self.env.ref('revatua_armateur.fretlist0').id,
             }
 
             if (conn['paiement'] == 'EXPEDITEUR'):
@@ -321,6 +320,9 @@ class SaleOrder(models.Model):
 
             # Create connaissement
             new_order = self.create(order_vals)
+            pricelist = new_order.partner_invoice_id.property_product_pricelist
+            new_order.pricelist_id = pricelist.id and pricelist.type == 'fret'\
+                or self.env.ref('revatua_armateur.fretlist0').id
 
             for line in conn['detailConnaissements']:
                 # on crée le sale_order_line avant pour y appliquer la méthode de calcul des prix
