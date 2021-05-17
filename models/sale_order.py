@@ -67,6 +67,14 @@ class SaleOrder(models.Model):
                           tracking=True,
                           readonly=True)
 
+    @api.onchange('partner_invoice_id')
+    def onchange_partner_invoice_id(self):
+        if self.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
+            pricelist = self.partner_invoice_id.property_product_pricelist
+            if pricelist.type == 'fret':
+                self.pricelist_id = pricelist and pricelist.id\
+                    or self.env.ref('revatua_armateur.fretlist0')
+
     @api.depends('iledepart_id', 'ilearrivee_id')
     def _compute_voyage_id_domain(self):
         for order in self:
