@@ -375,9 +375,24 @@ class SaleOrder(models.Model):
             ]).id
 
         if (not expediteur):
-            expediteur = self.env['res.partner'].name_create(
-                values['denomination']
-            )[0]
+            new_partner = {
+                'name': values['denomination'],
+                'email': values['mail'],
+                'is_company': False
+            }
+
+            if (values['numeroTahiti']):
+                new_partner.update({
+                    'is_company': True,
+                    'vat': values['numeroTahiti']
+                })
+
+            if (values['telephone'] and values['telephone'][0] == '8'):
+                new_partner['mobile'] = values['telephone']
+            else:
+                new_partner['phone'] = values['telephone']
+
+            expediteur = self.env['res.partner'].create(new_partner).id
 
         return expediteur
 
@@ -402,10 +417,24 @@ class SaleOrder(models.Model):
             ]).id
 
         if (not destinataire):
-            destinataire = self.env['res.partner'].name_create(
-                values['denomination']
-            )[0]
+            new_partner = {
+                'name': values['denomination'],
+                'email': values['mail'],
+                'is_company': False
+            }
 
+            if (values['numeroTahiti']):
+                new_partner.update({
+                    'is_company': True,
+                    'vat': values['numeroTahiti']
+                })
+
+            if (values['telephone'] and values['telephone'][0] == '8'):
+                new_partner['mobile'] = values['telephone']
+            else:
+                new_partner['phone'] = values['telephone']
+
+            destinataire = self.env['res.partner'].create(new_partner).id
         return destinataire
 
     def _check_product_categ_codesh(self, values):
