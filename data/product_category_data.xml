@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+        <record id="product_cat_fret" model="product.category">
+            <field name="name">Fret</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+        </record>
+        <record id="product_cat_autre" model="product.category">
+            <field name="code_revatua">AUTRE</field>
+            <field name="name">Autres marchandises générales</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_coprah" model="product.category">
+            <field name="code_revatua">COPRAH</field>
+            <field name="name">Coprah</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_espcubi" model="product.category">
+            <field name="code_revatua">ESPCUBI</field>
+            <field name="name">Essence et Pétrole en Autre contenant (cubitainer...)</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_espft" model="product.category">
+            <field name="code_revatua">ESPFT</field>
+            <field name="name">Essence et Pétrole en fut de 200 L</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_esptq" model="product.category">
+            <field name="code_revatua">ESPTQ</field>
+            <field name="name">Essence et Pétrole en touque de 20 L</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_esspt" model="product.category">
+            <field name="code_revatua">ESSPT</field>
+            <field name="name">Essence ou pétrole en touque, fût ou container (non utilisé)</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_frigo" model="product.category">
+            <field name="code_revatua">FRIGO</field>
+            <field name="name">Produit en frigo</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_frigodgae" model="product.category">
+            <field name="code_revatua">FRIGODGAE</field>
+            <field name="name">Produit en frigo pris en charge</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_futvide" model="product.category">
+            <field name="code_revatua">FUTVIDE</field>
+            <field name="name">Fut ou container vide hydrocarbures en retour</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazb" model="product.category">
+            <field name="code_revatua">GAZB</field>
+            <field name="name">Bouteilles de gaz (non utilisé)</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazbtl13" model="product.category">
+            <field name="code_revatua">GAZBTL13</field>
+            <field name="name">Bouteille de gaz de 13 kg (ou inférieure à 50 kg), pleine ou vide</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazbtl50" model="product.category">
+            <field name="code_revatua">GAZBTL50</field>
+            <field name="name">Bouteille de gaz de 50 kg ou plus, pleine ou vide</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazcamion" model="product.category">
+            <field name="code_revatua">GAZCAMION</field>
+            <field name="name">Gaz en camion citerne</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazcubi" model="product.category">
+            <field name="code_revatua">GAZCUBI</field>
+            <field name="name">Gaz transporté dans un Autre conteneur (cubitainer)</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_gazole" model="product.category">
+            <field name="code_revatua">GAZOLE</field>
+            <field name="name">Gazoles (vrac ou conditionné)</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_hydrociterne" model="product.category">
+            <field name="code_revatua">HYDROCITERNE</field>
+            <field name="name">Gazole ou essence en camion citerne</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_mc" model="product.category">
+            <field name="code_revatua">MC</field>
+            <field name="name">Matériaux de construction</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_mcdgae" model="product.category">
+            <field name="code_revatua">MCDGAE</field>
+            <field name="name">Matériaux de construction pris en charge</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_pgc" model="product.category">
+            <field name="code_revatua">PGC</field>
+            <field name="name">Produits de grande consommation</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_ppiles" model="product.category">
+            <field name="code_revatua">PPILES</field>
+            <field name="name">Productions en provenance des îles hors coprah</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+        <record id="product_cat_ppn" model="product.category">
+            <field name="code_revatua">PPN</field>
+            <field name="name">Produits de première nécessité pris en charge</field>
+            <field name="property_cost_method">standard</field>
+            <field name="property_valuation">manual_periodic</field>
+            <field name="parent_id" ref="product_cat_fret"/>
+        </record>
+    </data>
+</odoo>
