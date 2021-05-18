@@ -64,11 +64,11 @@
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="after">
                 <field name="unit_compute" attrs="{'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
                 <field name="official_price" force_save="1" attrs="{'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
+                <field name="poids" attrs="{'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
                 <field name="longueur" attrs="{'invisible': [('unit_compute', '=', False)], 'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
                 <field name="largeur" attrs="{'invisible': [('unit_compute', '=', False)], 'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
                 <field name="hauteur" attrs="{'invisible': [('unit_compute', '=', False)], 'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
                 <field name="volume" attrs="{'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
-                <field name="poids" attrs="{'column_invisible' : [('parent.type_id', '!=', %(revatua_armateur.fret_sale_type)d)]}"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="attributes">
                 <attribute name="attrs">{'column_invisible' : [('parent.type_id', '=', %(revatua_armateur.fret_sale_type)d)]}</attribute>
