@@ -17,6 +17,20 @@ class SaleOrder(models.Model):
         self.iledepart_id = self.partner_id.state_id or False
         self.ilearrivee_id = self.partner_shipping_id.state_id or False
 
+    @api.depends('order_line.price_total')
+    def _amount_all(self):
+        for order in self:
+            super(SaleOrder, self)._amount_all()
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
+                minimum_fret_price = float(self.env['ir.config_parameter'].sudo(
+                ).get_param('revatua_armateur.minimum_fret_price'))
+                if order.amount_untaxed < minimum_fret_price:
+                    order.update({
+                        'amount_untaxed': minimum_fret_price,
+                        'amount_tax': order.amount_tax,
+                        'amount_total': minimum_fret_price + order.amount_tax,
+                    })
+
     def write(self, values):
         res = super(SaleOrder, self).write(values)
         if self.type_id == self.env.ref('revatua_armateur.fret_sale_type')\
@@ -562,8 +576,6 @@ class SaleOrderLine(models.Model):
                 'date') or fields.Datetime.now()
             vals = {}
             discount = 0.0
-            minimum_fret_price = float(self.env['ir.config_parameter'].sudo(
-            ).get_param('revatua_armateur.minimum_fret_price'))
             iles_ids = (self.order_id.iledepart_id.id,
                         self.order_id.ilearrivee_id.id)
             # on cherche le prix dans la priicelist
@@ -655,11 +667,9 @@ class SaleOrderLine(models.Model):
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
-                vals['price_unit'] = max(pricevolume * self.product_uom_qty, priceweight *
-                                         self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
+                vals['price_unit'] = max(pricevolume, priceweight)
             elif not self.unit_compute:
-                vals['price_unit'] = max(max(pricevolume * self.product_uom_qty, priceweight *
-                                         self.product_uom_qty)/self.product_uom_qty, minimum_fret_price)/self.product_uom_qty
+                vals['price_unit'] = max(pricevolume, priceweight)/self.product_uom_qty
             vals['discount'] = discount
             self.update(vals)
         return res
