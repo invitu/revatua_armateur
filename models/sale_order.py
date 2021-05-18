@@ -74,6 +74,7 @@ class SaleOrder(models.Model):
     def onchange_partner_invoice_id(self):
         if self.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
             pricelist = self.partner_invoice_id.property_product_pricelist
+            self.payment_term_id = self.partner_invoice_id.property_payment_term_id
             if pricelist.type == 'fret':
                 self.pricelist_id = pricelist and pricelist.id\
                     or self.env.ref('revatua_armateur.fretlist0')
