@@ -465,11 +465,11 @@ class SaleOrder(models.Model):
         Prepare the dict of values to create the new sale order line for a detail connaissement.
         """
 
-        res = {
-            'product_uom_qty': values['nbColis'],
-            'poids': values['poids'],
-            'volume': values['volume'],
-        }
+        basic_poids = self.env['uom.uom'].search(
+            [('id', '=', self.env.ref('uom.product_uom_kgm').id)])
+        basic_volume = self.env['uom.uom'].search(
+            [('id', '=', self.env.ref('uom.product_uom_cubic_meter').id)])
+        res = {'product_uom_qty': values['nbColis']}
 
         if (values['codeSH']['nomenclature']):
             product_id = self.env['product.product'].search([
@@ -487,14 +487,16 @@ class SaleOrder(models.Model):
         if (values['uniteVolume']):
             unite_volume = self.env['uom.uom'].search([
                 ('code_revatua', '=', values['uniteVolume'])
-            ]).id
-            res['unite_volume'] = unite_volume
+            ])
+            res['volume'] = unite_volume._compute_quantity(
+                values['volume'], basic_volume)
 
         if (values['unitePoids']):
             unite_poids = self.env['uom.uom'].search([
                 ('code_revatua', '=', values['unitePoids'])
-            ]).id
-            res['unite_poids'] = unite_poids
+            ])
+            res['poids'] = unite_poids._compute_quantity(
+                values['poids'], basic_poids)
 
         return res
 
