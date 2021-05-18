@@ -543,7 +543,7 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.order_id.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
                 line.price_subtotal = round(line.product_uom_qty * line.price_unit * (
-                    1 - (line.discount or 0.0 / 100.0)), precision_digits=0, rounding_method='DOWN')
+                    1 - (line.discount or 0.0) / 100.0), precision_digits=0, rounding_method='DOWN')
         return res
 
     @api.onchange('contenant_id')
