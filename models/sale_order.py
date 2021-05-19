@@ -149,7 +149,7 @@ class SaleOrder(models.Model):
             datas = {
                 "nbColis": line.product_uom_qty,
                 "description": line.name,
-                "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
+                "codeSH": line.product_id.nomenclaturepfcustoms_id.code,
                 "codeTarif": line.product_id.categ_id.code_revatua,
                 "stockage": "CALE",
                 "poids": poidstotal,
@@ -462,7 +462,7 @@ class SaleOrder(models.Model):
         """
         res = {}
         product_ids = self.env['product.product'].search([
-            ('nomenclaturepfcustoms_id.name',
+            ('nomenclaturepfcustoms_id.code',
              'like', values['codeSH']['nomenclature']),
             ('categ_id.code_revatua',
              '=', values['codeTarif']['code']),
@@ -491,7 +491,7 @@ class SaleOrder(models.Model):
 
         if (values['codeSH']['nomenclature']):
             product_id = self.env['product.product'].search([
-                ('nomenclaturepfcustoms_id.name',
+                ('nomenclaturepfcustoms_id.code',
                  'like', values['codeSH']['nomenclature'])
             ]).id
             res['product_id'] = product_id
