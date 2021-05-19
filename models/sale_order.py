@@ -172,10 +172,6 @@ class SaleOrder(models.Model):
                 raise UserError(
                     _("The expediteur is a company you must fill vat number."))
             expediteur['denomination'] = order.partner_id.name
-            if order.partner_id.mobile or order.partner_id.phone:
-                expediteur['telephone'] = order.partner_id.mobile or order.partner_id.phone
-            if order.partner_id.email:
-                expediteur['mail'] = order.partner_id.email
             if order.partner_id.vat:
                 expediteur['numeroTahiti'] = order.partner_id.vat
         return expediteur
@@ -187,10 +183,6 @@ class SaleOrder(models.Model):
                 raise UserError(
                     _("The destinataire is a company you must fill vat number."))
             destinataire['denomination'] = order.partner_shipping_id.name
-            if order.partner_shipping_id.mobile or order.partner_shipping_id.phone:
-                destinataire['telephone'] = order.partner_shipping_id.mobile or order.partner_shipping_id.phone
-            if order.partner_shipping_id.email:
-                destinataire['mail'] = order.partner_shipping_id.email
             if order.partner_shipping_id.vat:
                 destinataire['numeroTahiti'] = order.partner_shipping_id.vat
         return destinataire
