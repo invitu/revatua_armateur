@@ -47,7 +47,15 @@ class WizardPriceilistGetRevatua(models.TransientModel):
                     ('name', '=', dic['nomIleArrivee']),
                     ('country_id', '=', self.env.ref('base.pf').id),
                 ])
-            montant = dic['montant']
+            if codetarif in ('GAZCUBI', 'GAZOLE', 'GAZCAMION', 'HYDROCITERNE', 'FRIGO', 'FRIGODGAE'):
+                coef = 1000.0
+            elif codetarif in ('FUTVIDE', 'ESPFT'):
+                coef = 1000.0 / 200.0
+            elif codetarif in ('ESPTQ'):
+                coef = 1000.0 / 20.0
+            else:
+                coef = 1.0
+            montant = coef * dic['montant']
             print(categ_revatua)
             print(ile1)
             print(ile2)

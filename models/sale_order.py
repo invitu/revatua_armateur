@@ -659,6 +659,15 @@ class SaleOrderLine(models.Model):
             else:
                 price = 0.0
             # Ici on shunte encore tout, on considère que l'unité n'a pas changé...etc bref...
+
+            # Special Case for product that have a fixed volume or fixed price
+            # On récupère le poids et le volume de la fiche article
+            if self.product_id.volume != 0.0:
+                self.volume = self.product_id.volume
+                self.unit_compute = True
+            if self.product_id.weight != 0.0:
+                self.poids = self.product_id.weight
+                self.unit_compute = True
             pricevolume = price * self.volume
             priceweight = price * self.poids / 1000
 
@@ -671,6 +680,15 @@ class SaleOrderLine(models.Model):
             elif not self.unit_compute:
                 vals['price_unit'] = max(pricevolume, priceweight)/self.product_uom_qty
             vals['discount'] = discount
+
+            # Special Case for Gaz 13kg and Gaz 50kg
+            if self.product_id.categ_id in (
+                    self.env.ref('revatua_armateur.product_cat_gazbtl13'),
+                    self.env.ref('revatua_armateur.product_cat_gazbtl50'),
+            ):
+                vals['unit_compute'] = True
+                vals['price_unit'] = price
+
             self.update(vals)
         return res
 
