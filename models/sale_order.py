@@ -148,7 +148,6 @@ class SaleOrder(models.Model):
                 volumetotal = line.volume
             datas = {
                 "nbColis": line.product_uom_qty,
-                "contenant": line.contenant_id.name or 'false',
                 "description": line.name,
                 "codeSH": line.product_id.nomenclaturepfcustoms_id.name,
                 "codeTarif": line.product_id.categ_id.code_revatua,
@@ -161,6 +160,8 @@ class SaleOrder(models.Model):
             }
             if not line.official_price:
                 datas["montantLibre"] = line.price_subtotal
+            if line.contenant_id.id:
+                datas["contenant"] = line.contenant_id.name
             lines.append(datas)
 
         return lines
