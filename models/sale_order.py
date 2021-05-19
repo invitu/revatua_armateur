@@ -114,6 +114,16 @@ class SaleOrder(models.Model):
                 [('id', 'in', voyage_list)]
             )
 
+    def update_prices(self):
+        self.ensure_one()
+        if self.pricelist_id.type == 'fret':
+            for line in self.order_line.filtered(lambda line: not line.display_type):
+                line.product_id_volume_poids_change()
+            self.show_update_pricelist = False
+            self.message_post(body=_("Product prices have been recomputed according to pricelist <b>%s<b> ", self.pricelist_id.display_name))
+        else:
+            super(SaleOrder, self).update_prices()
+
     @api.onchange('type_facturation')
     def set_adresse_facturation(self):
         if self.type_facturation == 'expediteur':
