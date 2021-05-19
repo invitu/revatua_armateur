@@ -539,13 +539,13 @@ class SaleOrderLine(models.Model):
                                   default=lambda self: self.env.ref(
                                       'uom.product_uom_kgm'),
                                   domain=lambda self: [('category_id', '=', self.env.ref('uom.product_uom_categ_kgm').id)])
-    volume = fields.Float(string='Volume', digits='Volume',
-                          help='Volume is computed from dimensions but can be overwritten')
-    poids = fields.Float(string='Poids', digits='Stock Weight',
+    volume = fields.Float(string='Volume (m3)', digits='Volume',
+                          help='Volume is computed from dimensions but can be overwritten. Always in m3')
+    poids = fields.Float(string='Poids (kg)', digits='Stock Weight',
                          help='Weight is always in kg')
-    longueur = fields.Integer(string="Longueur", help='Longueur en cm')
-    largeur = fields.Integer(string="Largeur", help='Largeur en cm')
-    hauteur = fields.Integer(string="Hauteur", help='Hauteur en cm')
+    longueur = fields.Integer(string="Longueur (cm)", help='Longueur en cm')
+    largeur = fields.Integer(string="Largeur (cm)", help='Largeur en cm')
+    hauteur = fields.Integer(string="Hauteur (cm)", help='Hauteur en cm')
     unit_compute = fields.Boolean(string='Unit Compute',
                                   default=False,
                                   help='On coche quand on veut un calcul unitaire')
