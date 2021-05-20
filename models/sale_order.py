@@ -723,7 +723,7 @@ class SaleOrderLine(models.Model):
             priceweight = price * self.poids / 1000
 
             # on tague le champ official price
-            vals['official_price'] = pricelistitems and pricelistitem_id.official_price
+            vals['official_price'] = pricelistitems and pricelistitem_id.official_price or False
 
             # on voit si le volume est en global ou à l'unité
             if self.unit_compute:
