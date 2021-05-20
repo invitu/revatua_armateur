@@ -9,6 +9,7 @@
             <field name="name" position="after">
                 <field name="ile1_id"/>
                 <field name="ile2_id"/>
+                <field name="official_price"/>
             </field>
         </field>
     </record>
@@ -23,6 +24,9 @@
                     <field name="ile1_id"/>
                     <field name="ile2_id"/>
                 </group>
+            </group>
+            <group name="pricelist_rule_base" position="inside">
+                <field name="official_price"/>
             </group>
         </field>
     </record>
