@@ -502,7 +502,19 @@ class SaleOrder(models.Model):
                             codeshname=values['codeSH']['libelle'],
                             categ=values['codeTarif']['libelle'],
                             )
-
+            self._create_error_line(res, order_id)
+        product_id = self.env['product.product'].search([
+            ('nomenclaturepfcustoms_id.code',
+             'like', values['codeSH']['nomenclature'])
+        ])
+        # If there are no products at all for code sh, we add a comment line to warn and the product will be created
+        if not product_id:
+            res['display_type'] = 'line_note'
+            res['name'] = _('ATTENTION Received data is wrong : There is no product %(product)s with nomenclature %(codesh)s(%(codeshname)s). A new product hase been created',
+                            product=values['description'],
+                            codesh=values['codeSH']['nomenclature'],
+                            codeshname=values['codeSH']['libelle'],
+                            )
             self._create_error_line(res, order_id)
         return res
 
@@ -527,8 +539,23 @@ class SaleOrder(models.Model):
             product_id = self.env['product.product'].search([
                 ('nomenclaturepfcustoms_id.code',
                  'like', values['codeSH']['nomenclature'])
-            ]).id
-            res['product_id'] = product_id
+            ])
+            if not product_id:
+                product_id = self.env['product.product'].create({
+                    'name': values['description'],
+                    'taxes_id': False,
+                    'matiere_dangereuse': values['matiereDangereuse'],
+                    'purchase_ok': False,
+                    'nomenclaturepfcustoms_id': self.env['nomenclature.pf.customs'].search([
+                        ('code',
+                         'like', values['codeSH']['nomenclature'])
+                    ]).id,
+                    'categ_id': self.env['product.category'].search([
+                        ('code_revatua',
+                         '=', values['codeTarif']['code']),
+                    ]).id,
+                })
+            res['product_id'] = product_id.id
 
         if (values['contenant']):
             contenant = self.env['product.product'].search([
