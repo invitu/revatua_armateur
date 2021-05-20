@@ -44,6 +44,8 @@ class SaleOrder(models.Model):
             payload['version'] = self.version
             order_response = self.env['revatua.api'].api_put(url, payload)
             self.version = order_response.json()["version"]
+            # vérification du subtotal revatua avec celui d'odoo
+            self._check_order_total(order_response.json())
             # recup pdf
             self.manage_pdf(order_response)
             # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
@@ -288,6 +290,8 @@ class SaleOrder(models.Model):
                 self.manage_pdf(order_confirm)
                 # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
                 self.manage_client_ref()
+            # vérification du subtotal revatua avec celui d'odoo
+            order._check_order_total(order_confirm.json())
         return super(SaleOrder, self).action_confirm()
 
     def action_cancel(self):
@@ -532,6 +536,20 @@ class SaleOrder(models.Model):
                 values['poids'], basic_poids)
 
         return res
+
+    def _check_order_total(self, rev_order):
+        """
+        Check inconsistence between Revatua and Odoo product's subtotal
+        """
+        if (rev_order['montantTotal'] and rev_order['montantTotal'] < self.amount_untaxed):
+            error = {
+                'display_type': 'line_note',
+                'name': _('ATTENTION Problem on connaissement untaxed price: odoo price %(odoo_price)d is higher than revatua max price %(revatua_price)d.',
+                          odoo_price=self.amount_untaxed,
+                          revatua_price=rev_order['montantTotal'],
+                          )
+            }
+            self._create_error_line(error, self.id)
 
     def _check_subtotal(self, new_line, revatua_line):
         """
