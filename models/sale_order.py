@@ -355,16 +355,14 @@ class SaleOrder(models.Model):
                 # on crée le sale_order_line avant pour y appliquer la méthode de calcul des prix
                 # on check les inconsistences de product (correspondance categ et codesh)
                 # si on a une inconsistence, on cree une ligne commentaire
-                line_values = self._check_product_categ_codesh(line)
-                if line_values:
-                    line_values['order_id'] = new_order.id
-                    new_line = self.env['sale.order.line'].create(line_values)
-                    line_values = {}
+                line_values = self._check_product_categ_codesh(
+                    line, new_order.id)
                 # si on a une ligne de data, on continue le traitement
                 line_values = self._prepare_sale_order_line(line)
                 line_values['order_id'] = new_order.id
                 new_line = self.env['sale.order.line'].create(line_values)
                 new_line.product_id_volume_poids_change()
+                self._check_subtotal(new_line, line)
 
             # Confirmation dans Revatua
             url = "connaissements/" + str(conn['id']) + "/changeretat"
@@ -464,7 +462,7 @@ class SaleOrder(models.Model):
             destinataire = self.env['res.partner'].create(new_partner).id
         return destinataire
 
-    def _check_product_categ_codesh(self, values):
+    def _check_product_categ_codesh(self, values, order_id):
         """
         Check inconsistence between product, categ_id and codesh.
         Returns a comment order line if it's not consistent
@@ -485,13 +483,21 @@ class SaleOrder(models.Model):
                             codeshname=values['codeSH']['libelle'],
                             categ=values['codeTarif']['libelle'],
                             )
+
+            self._create_error_line(res, order_id)
         return res
+
+    def _create_error_line(self, error_line, connaissement_id):
+        """
+        Create an error line in a specific connaissement
+        """
+        error_line['order_id'] = connaissement_id
+        self.env['sale.order.line'].create(error_line)
 
     def _prepare_sale_order_line(self, values):
         """
         Prepare the dict of values to create the new sale order line for a detail connaissement.
         """
-
         basic_poids = self.env['uom.uom'].search(
             [('id', '=', self.env.ref('uom.product_uom_kgm').id)])
         basic_volume = self.env['uom.uom'].search(
@@ -526,6 +532,21 @@ class SaleOrder(models.Model):
                 values['poids'], basic_poids)
 
         return res
+
+    def _check_subtotal(self, new_line, revatua_line):
+        """
+        Check inconsistence between Revatua and Odoo product's subtotal
+        """
+        if (revatua_line['montantOfficiel'] and revatua_line['montantOfficiel'] < new_line.price_subtotal):
+            error = {
+                'display_type': 'line_note',
+                'name': _('ATTENTION Problem on line %(line)s : odoo price %(odoo_price)d is higher than revatua max price %(revatua_price)d.',
+                          line=new_line.name,
+                          odoo_price=new_line.price_subtotal,
+                          revatua_price=revatua_line['montantOfficiel'],
+                          )
+            }
+            self._create_error_line(error, new_line.order_id.id)
 
 
 class SaleOrderLine(models.Model):
