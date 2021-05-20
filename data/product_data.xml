@@ -9,5 +9,11 @@
             <field name="type">fret</field>
         </record>
 
+        <record id="correction_minimum_fret" model="product.product">
+            <field name="name">CORRECTION</field>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">service</field>
+        </record>
     </data>
 </odoo>

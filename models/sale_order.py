@@ -27,6 +27,7 @@ class SaleOrder(models.Model):
                 if order.amount_untaxed < minimum_fret_price:
                     order.update({
                         'amount_untaxed': minimum_fret_price,
+                        'correction': minimum_fret_price - order.amount_untaxed,
                         'amount_tax': order.amount_tax,
                         'amount_total': minimum_fret_price + order.amount_tax,
                     })
@@ -83,6 +84,7 @@ class SaleOrder(models.Model):
     version = fields.Char(string='Revatua Version', size=64, copy=False,
                           tracking=True,
                           readonly=True)
+    correction = fields.Monetary(string='Untaxed Amount', store=True, readonly=True, compute='_amount_all')
 
     @api.onchange('partner_invoice_id')
     def onchange_partner_invoice_id(self):
@@ -246,6 +248,11 @@ class SaleOrder(models.Model):
             " - Destinataire: " + self.partner_shipping_id.name +\
             " - " + self.iledepart_id.name + "/" + self.ilearrivee_id.name +\
             " - Voyage: " + self.voyage_id.display_name
+
+    def _create_invoices(self, grouped=False, final=False, date=None):
+        moves = super(SaleOrder, self)._create_invoices(grouped=grouped, final=final, date=date)
+        moves._add_minimum_fret_move_line()
+        return moves
 
     def action_confirm(self):
         for order in self:
