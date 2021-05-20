@@ -90,8 +90,9 @@ class SaleOrder(models.Model):
             pricelist = self.partner_invoice_id.property_product_pricelist
             self.payment_term_id = self.partner_invoice_id.property_payment_term_id
             if pricelist.type == 'fret':
-                self.pricelist_id = pricelist and pricelist.id\
-                    or self.env.ref('revatua_armateur.fretlist0')
+                self.pricelist_id = pricelist.id
+            else:
+                self.pricelist_id = self.env.ref('revatua_armateur.fretlist0').id
 
     @api.depends('iledepart_id', 'ilearrivee_id')
     def _compute_voyage_id_domain(self):
