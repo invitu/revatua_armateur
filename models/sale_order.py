@@ -235,8 +235,7 @@ class SaleOrder(models.Model):
         )["dernierEtatOfficialise"]["nomFichier"]
         pdf = self._get_pdf(self.id_revatua, event_id)
         # on enregistre le pdf
-        # TODO : il faut faire un message avec PJ pour que ca parte au client
-        self.env['ir.attachment'].create({
+        binary_pdf = self.env['ir.attachment'].create({
             'name': pdf_name,
             'type': 'binary',
             'datas': base64.b64encode(pdf),
@@ -244,6 +243,22 @@ class SaleOrder(models.Model):
             'res_id': self.id,
             'mimetype': 'application/pdf'
         })
+        # On envoie le pdf
+        self._send_email(binary_pdf.id)
+        # on efface le pdf
+        binary_pdf.unlink()
+
+    def _send_email(self, attach_id):
+        self.ensure_one()
+
+        template_id = self.env.ref(
+            'revatua_armateur.mail_template_sale_officialized')
+
+        if template_id:
+            template_id.attachment_ids = [(6, 0, [attach_id])]
+            self.with_context(force_send=True).message_post_with_template(
+                template_id.id, message_type='comment', email_layout_xmlid="mail.mail_notification_paynow")
+            template_id.attachment_ids = [(3, attach_id)]
 
     def manage_client_ref(self):
         self.client_order_ref = "Connaissement n°" + self.revatua_code +\
