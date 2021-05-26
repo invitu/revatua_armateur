@@ -9,11 +9,85 @@
             <field name="type">fret</field>
         </record>
 
+        <!--Fret Minimum Compensation product-->
         <record id="correction_minimum_fret" model="product.product">
             <field name="name">COMPENSATION FRET MINIMUM</field>
+            <field name="purchase_ok" eval="False"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="type">service</field>
+        </record>
+
+        <!--Special Revatua products for price calculation-->
+        <record id="full_fut_200L" model="product.product">
+            <field name="name">Essence ou Pétrole Fût 200L plein</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.2</field>
+            <field name="weight">200</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espft"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
+        </record>
+        <record id="empty_fut_200L" model="product.product">
+            <field name="name">Fût 200L vide</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.2</field>
+            <field name="weight">18</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_futvide"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73101010"/>
+        </record>
+        <record id="full_touque_20L" model="product.product">
+            <field name="name">Essence ou Pétrole Touque 20L pleine</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.02</field>
+            <field name="weight">20</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_esptq"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
+        </record>
+        <record id="full_bouteillegaz_13KG" model="product.product">
+            <field name="name">Bouteille de gaz 13 kg pleine</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.0522</field>
+            <field name="weight">28</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
+        </record>
+        <record id="empty_bouteillegaz_13KG" model="product.product">
+            <field name="name">Bouteille de gaz 13 kg vide</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.0522</field>
+            <field name="weight">15</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73110000"/>
+        </record>
+        <record id="full_bouteillegaz_50KG" model="product.product">
+            <field name="name">Bouteille de gaz 50 kg pleine</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.1805</field>
+            <field name="weight">83.5</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
+        </record>
+        <record id="empty_bouteillegaz_50KG" model="product.product">
+            <field name="name">Bouteille de gaz 50 kg vide</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">0.1805</field>
+            <field name="weight">33.5</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73110000"/>
         </record>
     </data>
 </odoo>
