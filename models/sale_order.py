@@ -19,18 +19,20 @@ class SaleOrder(models.Model):
 
     @api.depends('order_line.price_total')
     def _amount_all(self):
+        minimum_fret_price = float(self.env['ir.config_parameter'].sudo(
+        ).get_param('revatua_armateur.minimum_fret_price'))
         for order in self:
-            super(SaleOrder, self)._amount_all()
-            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
-                minimum_fret_price = float(self.env['ir.config_parameter'].sudo(
-                ).get_param('revatua_armateur.minimum_fret_price'))
-                if order.amount_untaxed < minimum_fret_price:
-                    order.update({
-                        'amount_untaxed': minimum_fret_price,
-                        'correction': minimum_fret_price - order.amount_untaxed,
-                        'amount_tax': order.amount_tax,
-                        'amount_total': minimum_fret_price + order.amount_tax,
-                    })
+            if order.type_id == self.env.ref('revatua_armateur.fret_sale_type')\
+                    and order.amount_untaxed < minimum_fret_price:
+                order.update({
+                    'amount_untaxed': minimum_fret_price,
+                    'correction': minimum_fret_price - order.amount_untaxed,
+                    'amount_tax': order.amount_tax,
+                    'amount_total': minimum_fret_price + order.amount_tax,
+                })
+
+            else:
+                super(SaleOrder, self)._amount_all()
 
     def write(self, values):
         res = super(SaleOrder, self).write(values)
