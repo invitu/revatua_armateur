@@ -10,6 +10,8 @@
                 <div>
                     <field name="est_contenant"/>
                     <label for="est_contenant"/>
+                    <field name="is_fret"/>
+                    <label for="is_fret"/>
                 </div>
                 <div>
                     <field name="matiere_dangereuse"/>

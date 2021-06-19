@@ -7,6 +7,7 @@ from odoo import api, fields, models, _
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    is_fret = fields.Boolean(string='Is Fret Product')
     nomenclaturepfcustoms_id = fields.Many2one(comodel_name='nomenclature.pf.customs', string='Nomenclature PF Customs', help='Nomenclature douanière en PF')
     matiere_dangereuse = fields.Boolean(string='Est une matière dangereuse',
                                         help='Cochez cette case s\'il s\'agit d\'une matière dangereuse')
