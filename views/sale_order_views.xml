@@ -4,7 +4,7 @@
         <field name="name">Revatua Quotations</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,kanban,form</field>
-        <field name="view_id" ref="sale.view_order_tree"/>
+        <field name="view_id" ref="sale.view_quotation_tree"/>
         <field name="domain" eval="[('type_id', '=', ref('revatua_armateur.fret_sale_type'))]"/>
         <field name="context" eval="{'default_type_id': ref('revatua_armateur.fret_sale_type')}"/>
     </record>
