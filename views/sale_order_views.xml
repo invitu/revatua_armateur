@@ -83,6 +83,9 @@
             <xpath expr="//field[@name='order_line']//tree//field[@name='tax_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <field name="amount_tax" position="after">
+                <field name="correction" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('correction', '=', 0)]}"/>
+            </field>
         </field>
     </record>
 </odoo>
