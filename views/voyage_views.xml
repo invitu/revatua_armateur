@@ -10,10 +10,11 @@
                 <header>
                     <button name="action_confirm" id="action_confirm"
                         string="Confirm" class="btn-primary" type="object"
-                        attrs="{'invisible': [('state', 'in', ['confirm'])]}"/>
+                        attrs="{'invisible': [('state', 'in', ['cancel', 'confirm'])]}"/>
                     <field name="state" widget="statusbar"/>
                     <button name="action_cancel" id="action_cancel"
                         string="Cancel" type="object"
+                        confirm="Are you sure you want to Cancel that Voyage ? This cannot be undone"
                         attrs="{'invisible': [('state', 'in', ['cancel'])]}"/>
                 </header>
                 <sheet>
