@@ -23,42 +23,41 @@
                     </div>
                     <group>
                         <field name="navire_id"/>
-                        <field name="date_depart"/>
-                        <field name="date_arrivee"/>
-                        <field name="ile_depart_id"/>
+                        <field name="date_depart" readonly="1"/>
+                        <field name="date_arrivee" readonly="1"/>
+                        <field name="ile_depart_id" readonly="1"/>
                     </group>
                     <notebook>
                         <page string="Trajets" name="voyage_communication">
                             <field name="trajet_ids" widget="section_and_note_one2many" mode="tree,kanban">
                                 <form>
                                     <group>
-                                        <field name="name"/>
-                                        <field name="date_depart"/>
                                         <field name="ile_depart_id"/>
+                                        <field name="date_depart"/>
                                         <field name="lieu_depart_id"/>
                                     </group>
                                     <group>
-                                        <field name="date_arrivee"/>
                                         <field name="ile_arrivee_id"/>
+                                        <field name="date_arrivee"/>
                                         <field name="lieu_arrivee_id"/>
                                     </group>
                                 </form>
                                 <tree>
                                     <field name="name"/>
-                                    <field name="date_depart"/>
                                     <field name="ile_depart_id"/>
+                                    <field name="date_depart"/>
                                     <field name="lieu_depart_id"/>
-                                    <field name="date_arrivee"/>
                                     <field name="ile_arrivee_id"/>
+                                    <field name="date_arrivee"/>
                                     <field name="lieu_arrivee_id"/>
                                 </tree>
                                 <kanban class="o_kanban_mobile" sample="1">
                                     <field name="name"/>
-                                    <field name="date_depart"/>
                                     <field name="ile_depart_id"/>
+                                    <field name="date_depart"/>
                                     <field name="lieu_depart_id"/>
-                                    <field name="date_arrivee"/>
                                     <field name="ile_arrivee_id"/>
+                                    <field name="date_arrivee"/>
                                     <field name="lieu_arrivee_id"/>
                                     <templates>
                                         <t t-name="kanban-box">
