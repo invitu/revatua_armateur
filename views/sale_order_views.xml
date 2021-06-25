@@ -37,6 +37,11 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_order_type.sot_view_order_form" />
         <field name="arch" type="xml">
+            <button name="action_cancel" position="attributes">
+                <attribute name="confirm">
+                    Are you sure you want to Cancel that Sale Order ? In case this is Fret and it already has a revatua code, this cannot be undone !
+                </attribute>
+            </button>
             <field name="type_id" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
