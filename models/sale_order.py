@@ -168,7 +168,7 @@ class SaleOrder(models.Model):
                 if not line.official_price:
                     datas["montantLibre"] = line.price_subtotal
                 if line.contenant_id.id:
-                    datas["contenant"] = line.contenant_id.name
+                    datas["idcontenant"] = line.contenant_id.id_revatua
                 lines.append(datas)
 
         return lines
