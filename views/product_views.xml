@@ -3,11 +3,17 @@
     <record id="product_category_form_view_revatua" model="ir.ui.view">
         <field name="name">product.category.form.revatua</field>
         <field name="model">product.category</field>
-        <field name="inherit_id" ref="product.product_category_form_view"/>
-        <field name="priority" eval="8"/>
+        <field name="inherit_id" ref="product.product_category_form_view" />
+        <field name="priority" eval="8" />
         <field name="arch" type="xml">
-            <field name="parent_id" position="before">
-                    <field name="code_revatua"/>
+            <field name="parent_id" position="replace">
+                <group>
+                    <field name="code_revatua" />
+                    <field name="parent_id" />
+                </group>
+                <group>
+                    <field name="dgae_supported" />
+                </group>
             </field>
         </field>
     </record>

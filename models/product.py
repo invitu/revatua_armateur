@@ -8,4 +8,6 @@ class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     code_revatua = fields.Char(string='Code Revatua', size=64,
-                             help='Code Revatua')
+                               help='Code Revatua')
+    dgae_supported = fields.Boolean(
+        default=False, help="Category is supported by the DGAE")
