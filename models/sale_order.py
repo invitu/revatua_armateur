@@ -727,6 +727,9 @@ class SaleOrderLine(models.Model):
                 item_ids)
             if pricelistitems:
                 pricelistitem_id = pricelistitems[0]
+            if (self.order_id.type_facturation == 'dgae' and not self.product_id.categ_id.dgae_supported):
+                raise UserError(
+                    _("Le produit n'est pas pris en charge par la DGAE."))
             # Ici on considère qu'on a qu'un seul résultat et que le prix est en mode fixed price...etc... bref, on est vraiment dans du specifique
             # On gère le rule.base == pricelist
             if pricelistitems and pricelistitem_id.base == 'pricelist':
