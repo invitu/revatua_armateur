@@ -387,6 +387,9 @@ class SaleOrder(models.Model):
                 line_values['order_id'] = new_order.id
                 new_line = self.env['sale.order.line'].create(line_values)
                 new_line.product_id_volume_poids_change()
+                # si facturation est pour la dgae, check si product est pris en charge
+                if (conn['paiement'] == 'DGAE'):
+                    self._check_ppn(new_line)
                 self._check_subtotal(new_line, line)
 
             # Confirmation dans Revatua
@@ -614,6 +617,23 @@ class SaleOrder(models.Model):
             }
             self._create_error_line(error, new_line.order_id.id)
 
+    def _check_ppn(self, line):
+        """
+        Check if product is taken in charge (ppn) and create an error line otherwise
+        """
+        if not line.product_id.categ_id.dgae_supported:
+            error = {
+                'display_type': 'line_note',
+                'name': _('ATTENTION Product not taken in charge: designation %(product)s with nomenclature %(codesh)s(%(codeshname)s) and category %(categ)s.',
+                          product=line['name'],
+                          codesh=line.product_id.nomenclaturepfcustoms_id.code,
+                          codeshname=line.product_id.nomenclaturepfcustoms_id.name,
+                          categ=line.product_id.categ_id.name,
+                          )
+            }
+            self._create_error_line(error, line.order_id.id)
+
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -671,6 +691,11 @@ class SaleOrderLine(models.Model):
         # Version a l'arrache complet... il faut faire gaffe !!!
         res = super(SaleOrderLine, self).product_id_change()
         if self.order_id.pricelist_id.type == 'fret' and self.product_id:
+            # vérifie si le produit est pris en charge
+            if (self.order_id.type_facturation == 'dgae' and not self.product_id.categ_id.dgae_supported):
+                raise UserError(
+                    _("Le produit n'est pas pris en charge par la DGAE."))
+
             date = self.order_id.validity_date or self.order_id.date_order or self._context.get(
                 'date') or fields.Datetime.now()
             vals = {}
