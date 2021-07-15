@@ -34,6 +34,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
         'data/mail_data.xml',
         'views/voyage_views.xml',
         'views/sale_order_views.xml',
+        'views/res_partner_views.xml',
         'views/product_template_views.xml',
         'wizard/product_price_list_revatua_update_view.xml',
         'wizard/duplicate_voyages_views.xml',

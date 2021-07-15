@@ -91,13 +91,18 @@ class SaleOrder(models.Model):
 
     @api.onchange('partner_invoice_id')
     def onchange_partner_invoice_id(self):
+        self.ensure_one()
+        if not self.partner_invoice_id:
+            return
+        self = self.with_company(self.company_id)
         if self.type_id == self.env.ref('revatua_armateur.fret_sale_type'):
-            pricelist = self.partner_invoice_id.property_product_pricelist
-            self.payment_term_id = self.partner_invoice_id.property_payment_term_id
-            if pricelist.type == 'fret':
-                self.pricelist_id = pricelist.id
-            else:
-                self.pricelist_id = self.env.ref('revatua_armateur.fretlist0').id
+            values = {
+                'pricelist_id': self.partner_invoice_id.property_product_pricelist_fret
+                and self.partner_invoice_id.property_product_pricelist_fret.id
+                or self.env.ref('revatua_armateur.fretlist0').id,
+                'payment_term_id': self.partner_invoice_id.property_payment_term_id.id,
+            }
+            self.update(values)
 
     @api.depends('iledepart_id', 'ilearrivee_id')
     def _compute_voyage_id_domain(self):
