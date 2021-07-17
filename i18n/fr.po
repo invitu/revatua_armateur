@@ -36,3 +36,18 @@ msgstr "Expéditeur"
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 msgid "Delivery Address"
 msgstr "Destinataire"
+
+#. module: revatua_armateur
+#: model_terms:ir.ui.view,arch_db:revatua_armateur.dgae_invoices_wizard
+msgid "View"
+msgstr "Voir"
+
+#. module: revatua_armateur
+#: model:ir.model.fields,field_description:revatua_armateur.field_dgae_invoices_report_wizard__date_at
+msgid "Date At"
+msgstr "Au"
+
+#. module: revatua_armateur
+#: model:ir.model.fields,field_description:revatua_armateur.field_dgae_invoices_report_wizard__date_from
+msgid "Date From"
+msgstr "Du"
