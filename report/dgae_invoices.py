@@ -54,7 +54,6 @@ class DgaeInvoicesReport(models.AbstractModel):
         # Format list of invoices to return
         for sale in sales:
             conn = {}
-            # __import__('pdb').set_trace()
             conn['numeroVoyage'] = sale.revatua_code
             conn['dateVoyage'] = sale.voyage_id.date_depart
             conn['destination'] = sale.ilearrivee_id.name
@@ -70,7 +69,7 @@ class DgaeInvoicesReport(models.AbstractModel):
             partner_id = sale.partner_id.id
             exists = next((i for i, item in enumerate(
                 invoices) if item['partner_id'] == partner_id), None)
-            if (exists):
+            if exists is not None:
                 invoices[exists]['connaissements'].append(conn)
             else:
                 invoice = {}
