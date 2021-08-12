@@ -183,7 +183,8 @@ class Voyage(models.Model):
     def action_cancel(self):
         if self.name:
             url = 'voyages/' + self.name
-            voyage_response = self.env['revatua.api'].api_patch(url)
+            payload = {}
+            voyage_response = self.env['revatua.api'].api_patch(url, payload)
         self.state = 'cancel'
 
     def write(self, values):
