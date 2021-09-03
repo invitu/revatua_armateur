@@ -63,8 +63,8 @@ class DgaeInvoicesReport(models.AbstractModel):
 
             for line in sale.order_line:
                 conn['qty'] = int(conn.get('qty', 0) + line.product_uom_qty)
-                conn['volume'] = int(conn.get('volume', 0) + line.volume)
-                conn['poids'] = int(conn.get('poids', 0) + line.poids)
+                conn['volume'] = float(conn.get('volume', 0) + line.volume)
+                conn['poids'] = float(conn.get('poids', 0) + line.poids)
 
             partner_id = sale.partner_id.id
             exists = next((i for i, item in enumerate(

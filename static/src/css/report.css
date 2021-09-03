@@ -104,6 +104,13 @@
   font-weight: bold;
 }
 
+.full_total_value {
+  background-color: lightgrey;
+  border: 1px solid grey !important;
+  text-decoration-line: underline;
+  font-weight: bold;
+}
+
 .overflow_ellipsis {
   text-overflow: ellipsis;
   overflow: hidden;

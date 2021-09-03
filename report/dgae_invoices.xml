@@ -26,6 +26,11 @@
                             <h6 class="mt0 sub_header" t-raw="title or 'Odoo Report'" />
                         </div>
 
+                        <!-- Set total of all table's total -->
+                        <t t-set="full_total_poids" t-value="0" />
+                        <t t-set="full_total_volume" t-value="0" />
+                        <t t-set="full_total_montant" t-value="0" />
+
                         <!-- Display a table per shipper -->
                         <t t-foreach="invoices" t-as="invoice">
                             <div class="page_break">
@@ -87,12 +92,12 @@
                                         </div>
                                         <!--## poids -->
                                         <div class="act_as_cell">
-                                            <span t-esc="conn['poids']" />
+                                            <span t-esc="'%.3f'% conn['poids']" />
                                             <t t-set="total_poids" t-value="total_poids + conn['poids']" />
                                         </div>
                                         <!--## volume -->
                                         <div class="act_as_cell">
-                                            <span t-esc="conn['volume']" />
+                                            <span t-esc="'%.3f'% conn['volume']" />
                                             <t t-set="total_volume" t-value="total_volume + conn['volume']" />
                                         </div>
                                         <!--## amount_residual-->
@@ -115,17 +120,42 @@
                                         <span t-esc="total_nb_colis" />
                                     </div>
                                     <div class="act_as_cell total_value" style="width: 10%;">
-                                        <span t-esc="total_poids" />
+                                        <span t-esc="'%.3f'% total_poids" />
+                                        <t t-set="full_total_poids" t-value="total_poids + full_total_poids" />
                                     </div>
                                     <div class="act_as_cell total_value" style="width: 10%;">
-                                        <span t-esc="total_volume" />
+                                        <span t-esc="'%.3f'% total_volume" />
+                                        <t t-set="full_total_volume" t-value="total_volume + full_total_volume" />
                                     </div>
                                     <div class="act_as_cell amount total_value" style="width: 15%;">
                                         <span t-esc="total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                        <t t-set="full_total_montant" t-value="total_montant + full_total_montant" />
                                     </div>
                                 </div>
                             </div>
                         </t>
+
+                        <!-- Display total amount -->
+                        <div class="act_as_table list_table full_totals_table" style="width: 100%;margin-top: 20px;">
+                            <div class="act_as_row lines" style="font-weight: bold;">
+                                <div class="act_as_cell" style="width: 10%;" />
+                                <div class="act_as_cell" style="width: 10%;" />
+                                <div class="act_as_cell" style="width: 20%;" />
+                                <div class="act_as_cell" style="width: 8%;" />
+                                <div class="act_as_cell" style="width: 10%;"></div>
+                                <div class="act_as_cell full_total_value" style="width: 7%;">TOTAUX</div>
+                                <div class="act_as_cell full_total_value" style="width: 10%;">
+                                    <span t-esc="'%.3f'% full_total_poids" />
+                                </div>
+                                <div class="act_as_cell full_total_value" style="width: 10%;">
+                                    <span t-esc="'%.3f'% full_total_volume" />
+                                </div>
+                                <div class="act_as_cell amount full_total_value" style="width: 15%;">
+                                    <span t-esc="full_total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </t>
             </t>
