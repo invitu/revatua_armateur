@@ -10,7 +10,16 @@
                 <header>
                     <button name="action_confirm" id="action_confirm"
                         string="Confirm" class="btn-primary" type="object"
-                        attrs="{'invisible': [('state', 'in', ['cancel', 'confirm'])]}"/>
+                        attrs="{'invisible': [('state', 'in', ['cancel', 'confirm', 'done'])]}"/>
+                    <button name="action_done" id="action_done"
+                        string="Done" class="btn-primary" type="object"
+                        confirm="Please note, manifest will be generated and you will no longer be able to enter a connaissement"
+                        attrs="{'invisible': [('state', 'in', ['cancel', 'draft', 'done'])]}"
+                        groups="revatua_connector.group_revatua_manager"  />
+                    <button name="action_reopen" id="action_reopen"
+                        string="Reopen" class="btn-primary" type="object"
+                        attrs="{'invisible': [('state', 'in', ['cancel', 'draft', 'confirm'])]}"
+                        groups="revatua_connector.group_revatua_manager"  />
                     <field name="state" widget="statusbar"/>
                     <button name="action_cancel" id="action_cancel"
                         string="Cancel" type="object"

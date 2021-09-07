@@ -51,3 +51,23 @@ msgstr "Au"
 #: model:ir.model.fields,field_description:revatua_armateur.field_dgae_invoices_report_wizard__date_from
 msgid "Date From"
 msgstr "Du"
+
+#. module: revatua_armateur
+#: model:ir.model.fields.selection,name:revatua_armateur.selection__voyage__state__done
+#: model_terms:ir.ui.view,arch_db:revatua_armateur.view_revatua_voyage_form
+msgid "Done"
+msgstr "Terminer"
+
+#. module: revatua_armateur
+#: model_terms:ir.ui.view,arch_db:revatua_armateur.view_revatua_voyage_form
+msgid "Reopen"
+msgstr "Réouvrir"
+
+#. module: revatua_armateur
+#: model_terms:ir.ui.view,arch_db:revatua_armateur.view_revatua_voyage_form
+msgid ""
+"Please note, manifest will be generated and you will no longer be able to enter a"
+"connaissement"
+msgstr ""
+"Attention, le manifeste sera généré et vous ne pourrez plus saisir de "
+"connaissement"

@@ -61,6 +61,7 @@ class Voyage(models.Model):
         selection=[
             ('draft', 'Draft'),
             ('confirm', 'Confirmed'),
+            ('done', 'Done'),
             ('cancel', 'Cancelled'),
         ], string='Status', readonly=True, copy=False, index=True, default='draft')
     version = fields.Char('Version', help="La version des données - pour gérer les problèmes de concurrence")
@@ -180,12 +181,44 @@ class Voyage(models.Model):
                 voyage_response = voyage.env['revatua.api'].api_put(url, payload)
             voyage.state = 'confirm'
 
+    def action_done(self):
+        for trajet in self.trajet_ids:
+            tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
+            if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
+                revatua_certif_pwd = self.env['ir.config_parameter'].sudo(
+                ).get_param('revatua_armateur.revatua_certif_pwd')
+
+                # Get Revatua's periple/trajet ids
+                url = 'voyages/' + self.name + '/periples'
+                periples_response = self.env['revatua.api'].api_get(url)
+                for periple in periples_response.json():
+                    # Everytime 'Tahiti' is in the trajet, request a manifest
+                    if 29 in (periple['ileDepart']['id'], periple['ileArrivee']['id']):
+                        departure_arrival_status = 'depart' if (
+                            periple['ileDepart']['nom'] == 'Tahiti') else 'arrivee'
+                        url = 'voyages/' + self.name + '/trajets/' + str(periple['id']) + '/manifeste'
+                        manifest_response = self.env['revatua.api'].api_patch(
+                            url, {"mdp": revatua_certif_pwd})
+
+                        self.env['ir.attachment'].create({
+                            'name': 'manifest_' + departure_arrival_status,
+                            'type': 'binary',
+                            'datas': base64.b64encode(manifest_response.content),
+                            'res_model': 'voyage',
+                            'res_id': self.id,
+                            'mimetype': 'application/pdf'
+                        })
+        self.state = 'done'
+
     def action_cancel(self):
         if self.name:
             url = 'voyages/' + self.name
             payload = {}
             voyage_response = self.env['revatua.api'].api_patch(url, payload)
         self.state = 'cancel'
+
+    def action_reopen(self):
+        self.state = 'confirm'
 
     def write(self, values):
         timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
