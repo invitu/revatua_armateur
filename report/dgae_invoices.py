@@ -38,13 +38,13 @@ class DgaeInvoicesReport(models.AbstractModel):
                 ('partner_id', '=', dgae_id),
                 ('invoice_date', '>=', data['date_from']),
                 ('invoice_date', '<=', data['date_at']),
-                ('payment_state', '!=', 'paid')
+                ('state',  '=', 'posted')
             ])
         else:
             move_ids = self.env['account.move'].search([
                 ('partner_id', '=', dgae_id),
                 ('invoice_date', '<=', data['date_at']),
-                ('payment_state', '!=', 'paid')
+                ('state',  '=', 'posted')
             ])
 
         # Get sales associated to selected moves
@@ -59,6 +59,7 @@ class DgaeInvoicesReport(models.AbstractModel):
             conn['destination'] = sale.ilearrivee_id.name
             conn['destinataire'] = sale.partner_shipping_id.parent_id.name if sale.partner_shipping_id.parent_id.name else sale.partner_shipping_id.name
             conn['numeroTahiti'] = sale.partner_id.vat
+            # montant du sale_order et non de account_move car on considère qu'à chaque sale_order, on a un account_move du même montant
             conn['montant'] = int(sale.amount_untaxed)
 
             for line in sale.order_line:

@@ -7,10 +7,10 @@
                 <t t-call="revatua_armateur.internal_layout">
                     <t t-set="title">
                         <div style="float: left;">
-                            RELEVÉ DE FACTURE
+                            RELEVÉ DE FACTURES
                         </div>
                         <div style="float: right; width: 40%; text-align: center;">
-                            DIRECTION GENERALE DES AFFAIRES
+                            DIRECTION GENERALE DES AFFAIRES ECONOMIQUES
                             - DGAE BP 82 - 98713 PAPEETE
                         </div>
                     </t>
