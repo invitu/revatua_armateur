@@ -104,11 +104,13 @@
   font-weight: bold;
 }
 
-.full_total_value {
+.full_total_header {
   background-color: lightgrey;
   border: 1px solid grey !important;
-  text-decoration-line: underline;
-  font-weight: bold;
+}
+
+.full_total_value {
+  border: 1px solid grey !important;
 }
 
 .overflow_ellipsis {

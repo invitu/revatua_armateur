@@ -3,160 +3,201 @@
 
     <template id="dgae_invoices">
         <t t-call="web.html_container">
-            <t t-call="web.external_layout">
-                <t t-call="revatua_armateur.internal_layout">
-                    <t t-set="title">
-                        <div style="float: left;">
-                            RELEVÉ DE FACTURES
-                        </div>
-                        <div style="float: right; width: 40%; text-align: center;">
-                            DIRECTION GENERALE DES AFFAIRES ECONOMIQUES
-                            - DGAE BP 82 - 98713 PAPEETE
-                        </div>
-                    </t>
-
-                    <div class="page ">
-                        <div class="row top_header p-2">
-                            <div class="date">
-                                <span style="text-decoration-line: underline;">Date:</span>
-                                <span t-esc=" context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')" />
+            <t t-foreach="categ_list" t-as="categ">
+                <t t-call="web.external_layout">
+                    <t t-call="revatua_armateur.internal_layout">
+                        <t t-set="title">
+                            <div style="float: left;">
+                                RELEVÉ DE FACTURES
                             </div>
-                        </div>
-                        <div class="row p-2">
-                            <h6 class="mt0 sub_header" t-raw="title or 'Odoo Report'" />
-                        </div>
+                            <div style="float: right; width: 40%; text-align: center;">
+                                DIRECTION GENERALE DES AFFAIRES ECONOMIQUES
+                                - DGAE BP 82 - 98713 PAPEETE
+                            </div>
+                        </t>
 
-                        <!-- Set total of all table's total -->
-                        <t t-set="full_total_poids" t-value="0" />
-                        <t t-set="full_total_volume" t-value="0" />
-                        <t t-set="full_total_montant" t-value="0" />
-
-                        <!-- Display a table per shipper -->
-                        <t t-foreach="invoices" t-as="invoice">
-                            <div class="page_break">
-                                <!-- Display shipper name -->
-                                <div class="act_as_table list_table" style="margin-top: 10px;" />
-                                <h5 class=" shipper_title" t-esc="invoice['expediteur']" />
+                        <div class="page ">
+                            <div class="row top_header p-2">
+                                <div class="date">
+                                    <span style="text-decoration-line: underline;">Date:</span>
+                                    <span t-esc=" context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')" />
+                                </div>
+                            </div>
+                            <div class="row p-2">
+                                <h6 class="mt0 sub_header" t-raw="title or 'Odoo Report'" />
                             </div>
 
-                            <!-- Display Table -->
-                            <div class="act_as_table data_table" style="width: 100%;">
-                                <!-- Display header -->
-                                <div class="act_as_thead">
-                                    <div class="act_as_row labels">
-                                        <div class="act_as_cell" style="width: 10%;">Date Voyage</div>
-                                        <div class="act_as_cell" style="width: 10%;">N° VOY</div>
-                                        <div class="act_as_cell" style="width: 20%;">Destinataire</div>
-                                        <div class="act_as_cell" style="width: 8%;">N° Tahiti</div>
-                                        <div class="act_as_cell" style="width: 10%;">Destination</div>
-                                        <div class="act_as_cell" style="width: 7%;">Nb Colis</div>
-                                        <div class="act_as_cell" style="width: 10%;">Poids (kg)</div>
-                                        <div class="act_as_cell" style="width: 10%;">Volume (m3)</div>
-                                        <div class="act_as_cell" style="width: 15%;">Montant fret hors TVA</div>
+                            <!-- Set total of all table's total -->
+                            <t t-set="full_total_poids" t-value="0" />
+                            <t t-set="full_total_volume" t-value="0" />
+                            <t t-set="full_total_montant" t-value="0" />
 
-                                        <!-- Set total values to 0 -->
-                                        <t t-set="total_nb_colis" t-value="0" />
-                                        <t t-set="total_poids" t-value="0" />
-                                        <t t-set="total_volume" t-value="0" />
-                                        <t t-set="total_montant" t-value="0" />
-                                    </div>
+                            <!-- Display category name -->
+                            <div class="">
+                                <span style="font-weight: bold;">Catégorie : </span>
+                                <span>
+                                    <t t-esc="categ['categ_id']['name']" />
+                                </span>
+                            </div>
+
+                            <!-- Display a table per shipper -->
+                            <t t-foreach="categ['invoices']" t-as="invoice">
+                                <div class="page_break">
+                                    <!-- Display shipper name -->
+                                    <div class="act_as_table list_table" style="margin-top: 10px;" />
+                                    <h5 class=" shipper_title" t-esc="invoice['expediteur']" />
                                 </div>
 
-                                <!-- Display one line per invoice -->
-                                <t t-foreach="invoice['connaissements']" t-as="conn">
-                                    <div class="act_as_row lines">
-                                        <!--## date voyage -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="conn['dateVoyage'].strftime('%d-%m-%Y')" />
-                                        </div>
-                                        <!--## n° voy -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="conn['numeroVoyage']" />
-                                        </div>
-                                        <!--## destinataire -->
-                                        <div class="act_as_cell ">
-                                            <span t-esc="conn['destinataire']" />
-                                        </div>
-                                        <!--## n° Tahiti -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="conn['numeroTahiti']" />
-                                        </div>
-                                        <!--## destination -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="conn['destination']" />
-                                        </div>
-                                        <!--## nb colis -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="conn['qty']" />
-                                            <t t-set="total_nb_colis" t-value="total_nb_colis+conn['qty']" />
-                                        </div>
-                                        <!--## poids -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="'%.3f'% conn['poids']" />
-                                            <t t-set="total_poids" t-value="total_poids + conn['poids']" />
-                                        </div>
-                                        <!--## volume -->
-                                        <div class="act_as_cell">
-                                            <span t-esc="'%.3f'% conn['volume']" />
-                                            <t t-set="total_volume" t-value="total_volume + conn['volume']" />
-                                        </div>
-                                        <!--## amount_residual-->
-                                        <div class="act_as_cell amount">
-                                            <span t-esc="conn['montant']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
-                                            <t t-set="total_montant" t-value="total_montant + conn['montant']" />
+                                <!-- Display Table -->
+                                <div class="act_as_table data_table" style="width: 100%;">
+                                    <!-- Display header -->
+                                    <div class="act_as_thead">
+                                        <div class="act_as_row labels">
+                                            <div class="act_as_cell" style="width: 10%;">Date Voyage</div>
+                                            <div class="act_as_cell" style="width: 10%;">N° VOY</div>
+                                            <div class="act_as_cell" style="width: 20%;">Destinataire</div>
+                                            <div class="act_as_cell" style="width: 8%;">N° Tahiti</div>
+                                            <div class="act_as_cell" style="width: 10%;">Destination</div>
+                                            <div class="act_as_cell" style="width: 7%;">Nb Colis</div>
+                                            <div class="act_as_cell" style="width: 10%;">Poids (kg)</div>
+                                            <div class="act_as_cell" style="width: 10%;">Volume (m3)</div>
+                                            <div class="act_as_cell" style="width: 15%;">Montant fret hors TVA</div>
+
+                                            <!-- Set total values to 0 -->
+                                            <t t-set="total_nb_colis" t-value="0" />
+                                            <t t-set="total_poids" t-value="0" />
+                                            <t t-set="total_volume" t-value="0" />
+                                            <t t-set="total_montant" t-value="0" />
                                         </div>
                                     </div>
-                                </t>
-                            </div>
-                            <!-- Display total -->
-                            <div class="act_as_table list_table totals_table" style="width: 100%;">
+
+                                    <!-- Display one line per invoice -->
+                                    <t t-foreach="invoice['connaissements']" t-as="conn">
+                                        <div class="act_as_row lines">
+                                            <!--## date voyage -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="conn['dateVoyage'].strftime('%d-%m-%Y')" />
+                                            </div>
+                                            <!--## n° voy -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="conn['numeroVoyage']" />
+                                            </div>
+                                            <!--## destinataire -->
+                                            <div class="act_as_cell ">
+                                                <span t-esc="conn['destinataire']" />
+                                            </div>
+                                            <!--## n° Tahiti -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="conn['numeroTahiti']" />
+                                            </div>
+                                            <!--## destination -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="conn['destination']" />
+                                            </div>
+                                            <!--## nb colis -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="conn['qty']" />
+                                                <t t-set="total_nb_colis" t-value="total_nb_colis+conn['qty']" />
+                                            </div>
+                                            <!--## poids -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="'%.3f'% conn['poids']" />
+                                                <t t-set="total_poids" t-value="total_poids + conn['poids']" />
+                                            </div>
+                                            <!--## volume -->
+                                            <div class="act_as_cell">
+                                                <span t-esc="'%.3f'% conn['volume']" />
+                                                <t t-set="total_volume" t-value="total_volume + conn['volume']" />
+                                            </div>
+                                            <!--## amount_residual-->
+                                            <div class="act_as_cell amount">
+                                                <span t-esc="conn['montant']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                                <t t-set="total_montant" t-value="total_montant + conn['montant']" />
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                                <!-- Display total -->
+                                <div class="act_as_table list_table c" style="width: 100%;">
+                                    <div class="act_as_row lines" style="font-weight: bold;">
+                                        <div class="act_as_cell" style="width: 10%;" />
+                                        <div class="act_as_cell" style="width: 10%;" />
+                                        <div class="act_as_cell" style="width: 20%;" />
+                                        <div class="act_as_cell" style="width: 8%;" />
+                                        <div class="act_as_cell total_value" style="width: 10%;">TOTAUX</div>
+                                        <div class="act_as_cell total_value" style="width: 7%;">
+                                            <span t-esc="total_nb_colis" />
+                                        </div>
+                                        <div class="act_as_cell total_value" style="width: 10%;">
+                                            <span t-esc="'%.3f'% total_poids" />
+                                            <t t-set="full_total_poids" t-value="total_poids + full_total_poids" />
+                                        </div>
+                                        <div class="act_as_cell total_value" style="width: 10%;">
+                                            <span t-esc="'%.3f'% total_volume" />
+                                            <t t-set="full_total_volume" t-value="total_volume + full_total_volume" />
+                                        </div>
+                                        <div class="act_as_cell amount total_value" style="width: 15%;">
+                                            <span t-esc="total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                            <t t-set="full_total_montant" t-value="total_montant + full_total_montant" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- Display total amount -->
+                            <div class="act_as_table list_table" style="width: 100%;margin-top: 20px;">
                                 <div class="act_as_row lines" style="font-weight: bold;">
                                     <div class="act_as_cell" style="width: 10%;" />
                                     <div class="act_as_cell" style="width: 10%;" />
                                     <div class="act_as_cell" style="width: 20%;" />
                                     <div class="act_as_cell" style="width: 8%;" />
-                                    <div class="act_as_cell total_value" style="width: 10%;">TOTAUX</div>
-                                    <div class="act_as_cell total_value" style="width: 7%;">
-                                        <span t-esc="total_nb_colis" />
+                                    <div class="act_as_cell" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_header" style="width: 7%;">TOTAUX</div>
+                                    <div class="act_as_cell full_total_value" style="width: 10%;">
+                                        <span t-esc="'%.3f'% full_total_poids" />
                                     </div>
-                                    <div class="act_as_cell total_value" style="width: 10%;">
-                                        <span t-esc="'%.3f'% total_poids" />
-                                        <t t-set="full_total_poids" t-value="total_poids + full_total_poids" />
+                                    <div class="act_as_cell full_total_value" style="width: 10%;">
+                                        <span t-esc="'%.3f'% full_total_volume" />
                                     </div>
-                                    <div class="act_as_cell total_value" style="width: 10%;">
-                                        <span t-esc="'%.3f'% total_volume" />
-                                        <t t-set="full_total_volume" t-value="total_volume + full_total_volume" />
-                                    </div>
-                                    <div class="act_as_cell amount total_value" style="width: 15%;">
-                                        <span t-esc="total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
-                                        <t t-set="full_total_montant" t-value="total_montant + full_total_montant" />
+                                    <div class="act_as_cell full_total_value amount" style="width: 15%;">
+                                        <span t-esc="full_total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
                                     </div>
                                 </div>
                             </div>
-                        </t>
+                            <div class="act_as_table list_table" style="width: 100%;">
+                                <div class="act_as_row lines" style="font-weight: bold;">
+                                    <div class="act_as_cell" style="width: 10%;" />
+                                    <div class="act_as_cell" style="width: 10%;" />
+                                    <div class="act_as_cell" style="width: 20%;" />
+                                    <div class="act_as_cell" style="width: 8%;" />
+                                    <div class="act_as_cell" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_header" style="width: 7%;">TAXE</div>
+                                    <div class="act_as_cell full_total_value" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_value" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_value amount" style="width: 15%;">
+                                        <t t-set="taxe" t-value="max(max(full_total_poids / 1000, full_total_volume) * 100, 100)" />
+                                        <span t-esc="taxe" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="act_as_table list_table" style="width: 100%;">
+                                <div class="act_as_row lines" style="font-weight: bold;">
+                                    <div class="act_as_cell" style="width: 10%;" />
+                                    <div class="act_as_cell" style="width: 10%;" />
+                                    <div class="act_as_cell" style="width: 20%;" />
+                                    <div class="act_as_cell" style="width: 8%;" />
+                                    <div class="act_as_cell" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_header" style="width: 7%;">TTC</div>
+                                    <div class="act_as_cell full_total_value" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_value" style="width: 10%;"></div>
+                                    <div class="act_as_cell full_total_value amount" style="width: 15%;">
+                                        <span t-esc="taxe + full_total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Display total amount -->
-                        <div class="act_as_table list_table full_totals_table" style="width: 100%;margin-top: 20px;">
-                            <div class="act_as_row lines" style="font-weight: bold;">
-                                <div class="act_as_cell" style="width: 10%;" />
-                                <div class="act_as_cell" style="width: 10%;" />
-                                <div class="act_as_cell" style="width: 20%;" />
-                                <div class="act_as_cell" style="width: 8%;" />
-                                <div class="act_as_cell" style="width: 10%;"></div>
-                                <div class="act_as_cell full_total_value" style="width: 7%;">TOTAUX</div>
-                                <div class="act_as_cell full_total_value" style="width: 10%;">
-                                    <span t-esc="'%.3f'% full_total_poids" />
-                                </div>
-                                <div class="act_as_cell full_total_value" style="width: 10%;">
-                                    <span t-esc="'%.3f'% full_total_volume" />
-                                </div>
-                                <div class="act_as_cell amount full_total_value" style="width: 15%;">
-                                    <span t-esc="full_total_montant" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
-                                </div>
-                            </div>
                         </div>
-
-                    </div>
+                    </t>
                 </t>
             </t>
         </t>
