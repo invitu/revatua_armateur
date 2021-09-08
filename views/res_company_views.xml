@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_revatua_certif_pwd" model="ir.ui.view">
+        <field name="name">res.company.form.revatua.certif</field>
+        <field name="model">res.company</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="revatua_connector.view_company_form_revatua" />
+        <field name="arch" type="xml">
+            <field name="revatua_scope" position="after">
+                <field name="revatua_certif_pwd" password="True"/>
+            </field>
+        </field>
+    </record>
+</odoo>

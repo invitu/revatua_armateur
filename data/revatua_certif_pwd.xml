@@ -1,8 +1,0 @@
-<odoo>
-    <data noupdate="1">
-        <record id="revatua_certif_pwd" model="ir.config_parameter">
-            <field name="key">revatua_armateur.revatua_certif_pwd</field>
-            <field name="value"></field>
-        </record>
-    </data>
-</odoo>

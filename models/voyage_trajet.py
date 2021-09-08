@@ -185,8 +185,7 @@ class Voyage(models.Model):
         for trajet in self.trajet_ids:
             tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
             if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
-                revatua_certif_pwd = self.env['ir.config_parameter'].sudo(
-                ).get_param('revatua_armateur.revatua_certif_pwd')
+                revatua_certif_pwd = self.env.company.revatua_certif_pwd
 
                 # Get Revatua's periple/trajet ids
                 url = 'voyages/' + self.name + '/periples'
