@@ -184,31 +184,35 @@ class Voyage(models.Model):
 
     def action_done(self):
         timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
+        # We check if the voyage has Tahiti in Trajets
+        has_tahiti = False
         for trajet in self.trajet_ids:
             tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
             if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
-                revatua_certif_pwd = self.env.company.revatua_certif_pwd
+                has_tahiti = True
 
-                # Get Revatua's periple/trajet ids
-                url = 'voyages/' + self.name + '/periples'
-                periples_response = self.env['revatua.api'].api_get(url)
-                for periple in periples_response.json():
-                    # Everytime 'Tahiti' is in the trajet, request a manifest
-                    if 29 in (periple['ileDepart']['id'], periple['ileArrivee']['id']):
-                        departure_arrival_status = 'depart' if (
-                            periple['ileDepart']['nom'] == 'Tahiti') else 'arrivee'
-                        url = 'voyages/' + self.name + '/trajets/' + str(periple['id']) + '/manifeste'
-                        manifest_response = self.env['revatua.api'].api_patch(
-                            url, {"mdp": revatua_certif_pwd})
+        if has_tahiti:
+            revatua_certif_pwd = self.env.company.revatua_certif_pwd
+            # Get Revatua's periple/trajet ids
+            url = 'voyages/' + self.name + '/periples'
+            periples_response = self.env['revatua.api'].api_get(url)
+            for periple in periples_response.json():
+                # Everytime 'Tahiti' is in the trajet, request a manifest
+                if 29 in (periple['ileDepart']['id'], periple['ileArrivee']['id']):
+                    departure_arrival_status = 'depart' if (
+                        periple['ileDepart']['nom'] == 'Tahiti') else 'arrivee'
+                    url = 'voyages/' + self.name + '/trajets/' + str(periple['id']) + '/manifeste'
+                    manifest_response = self.env['revatua.api'].api_patch(
+                        url, {"mdp": revatua_certif_pwd})
 
-                        self.env['ir.attachment'].create({
-                            'name': 'manifest_' + self.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
-                            'type': 'binary',
-                            'datas': base64.b64encode(manifest_response.content),
-                            'res_model': 'voyage',
-                            'res_id': self.id,
-                            'mimetype': 'application/pdf'
-                        })
+                    self.env['ir.attachment'].create({
+                        'name': 'manifest_' + self.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
+                        'type': 'binary',
+                        'datas': base64.b64encode(manifest_response.content),
+                        'res_model': 'voyage',
+                        'res_id': self.id,
+                        'mimetype': 'application/pdf'
+                    })
         self.state = 'done'
 
     def action_cancel(self):
