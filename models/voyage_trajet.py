@@ -3,6 +3,7 @@
 from odoo import fields, models, api
 from datetime import datetime
 import pytz
+import base64
 
 
 class Trajet(models.Model):
@@ -182,6 +183,7 @@ class Voyage(models.Model):
             voyage.state = 'confirm'
 
     def action_done(self):
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         for trajet in self.trajet_ids:
             tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
             if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
@@ -200,7 +202,7 @@ class Voyage(models.Model):
                             url, {"mdp": revatua_certif_pwd})
 
                         self.env['ir.attachment'].create({
-                            'name': 'manifest_' + departure_arrival_status,
+                            'name': 'manifest_' + self.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
                             'type': 'binary',
                             'datas': base64.b64encode(manifest_response.content),
                             'res_model': 'voyage',
