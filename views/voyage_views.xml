@@ -114,7 +114,7 @@
                 <field name="date_depart"/>
                 <field name="ile_depart_id"/>
                 <field name="date_arrivee" string="Retour"/>
-                <field name="state" invisible="1"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
