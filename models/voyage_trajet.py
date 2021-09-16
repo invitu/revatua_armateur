@@ -112,6 +112,37 @@ class Voyage(models.Model):
             'confirm': [('readonly', False)],
         },
     )
+    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company.id)
+    sale_amount_total = fields.Monetary(compute='_compute_sale_data', string="Sum of Orders", help="Untaxed Total of Confirmed Orders", currency_field='company_currency')
+    order_ids = fields.One2many(comodel_name='sale.order', inverse_name='voyage_id', string='Sale Orders')
+    sale_order_count = fields.Integer(compute='_compute_sale_data', string='Number of SO')
+    company_currency = fields.Many2one("res.currency", string='Currency', related='company_id.currency_id', readonly=True)
+
+    @api.depends('order_ids.state', 'order_ids.currency_id', 'order_ids.amount_untaxed', 'order_ids.date_order', 'order_ids.company_id')
+    def _compute_sale_data(self):
+        for voyage in self:
+            total = 0.0
+            sale_order_cnt = 0
+            company_currency = voyage.company_currency or self.env.company.currency_id
+            for order in voyage.order_ids:
+                if order.state not in ('draft', 'sent', 'cancel'):
+                    sale_order_cnt += 1
+                    total += order.currency_id._convert(
+                        order.amount_untaxed, company_currency, order.company_id, order.date_order or fields.Date.today())
+            voyage.sale_amount_total = total
+            voyage.sale_order_count = sale_order_cnt
+
+    def action_view_sale_order(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("sale.action_orders")
+        action['context'] = {
+            'default_voyage_id': self.id,
+        }
+        action['domain'] = [('voyage_id', '=', self.id), ('state', 'not in', ('draft', 'sent', 'cancel'))]
+        orders = self.mapped('order_ids').filtered(lambda l: l.state not in ('draft', 'sent', 'cancel'))
+        if len(orders) == 1:
+            action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
+            action['res_id'] = orders.id
+        return action
 
     def name_get(self):
         result = []

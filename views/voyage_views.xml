@@ -27,6 +27,16 @@
                         attrs="{'invisible': [('state', 'in', ['cancel'])]}"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" attrs="{'invisible': [('sale_order_count', '=', 0)]}"
+                        name="action_view_sale_order" icon="fa-usd">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="sale_amount_total" widget="monetary" options="{'currency_field': 'company_currency'}"/></span>
+                                <span class="o_stat_text"> Sale Orders</span>
+                                <field name="sale_order_count" invisible="1"/>
+                            </div>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name"/></h1> 
