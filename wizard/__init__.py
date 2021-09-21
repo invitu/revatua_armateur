@@ -3,4 +3,4 @@
 
 from . import product_price_list_revatua_update
 from . import duplicate_voyages
-from . import dgae_invoices_wizard
+from . import partner_invoices_wizard

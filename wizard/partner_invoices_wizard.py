@@ -4,20 +4,28 @@
 from odoo import api, fields, models
 
 
-class DgaeInvoicesWizard(models.TransientModel):
-    """DGAE invoices report wizard."""
+class PartnerInvoicesWizard(models.TransientModel):
+    """Partner invoices report wizard."""
 
-    _name = "dgae.invoices.report.wizard"
-    _description = "DGAE Invoices Report Wizard"
+    _name = "partner.invoices.report.wizard"
+    _description = "Partner Invoices Report Wizard"
 
     date_at = fields.Date(required=True, default=fields.Date.context_today)
     date_from = fields.Date(string="Date From")
 
+    def _default_partner(self):
+        return self.env.ref('revatua_connector.partner_dgae').id
+
+    partner_id = fields.Many2one(
+        comodel_name="res.partner",
+        string="Partner",
+        default=_default_partner)
+
     def _print_report(self, report_type):
         self.ensure_one()
 
-        data = self._prepare_report_dgae_invoices()
-        report_name = "revatua_armateur.dgae_invoices"
+        data = self._prepare_report_partner_invoices()
+        report_name = "revatua_armateur.partner_invoices"
 
         return (
             self.env["ir.actions.report"]
@@ -39,10 +47,11 @@ class DgaeInvoicesWizard(models.TransientModel):
         report_type = "qweb-pdf"
         return self._print_report(report_type)
 
-    def _prepare_report_dgae_invoices(self):
+    def _prepare_report_partner_invoices(self):
         self.ensure_one()
 
         return {
             "date_at": self.date_at,
             "date_from": self.date_from or False,
+            "partner_id": self.partner_id.id,
         }

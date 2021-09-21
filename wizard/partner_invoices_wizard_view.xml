@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <!-- AGED PARTNER BALANCE -->
-    <record id="dgae_invoices_wizard" model="ir.ui.view">
-        <field name="name">Invoices DGAE</field>
-        <field name="model">dgae.invoices.report.wizard</field>
+    <record id="partner_invoices_wizard" model="ir.ui.view">
+        <field name="name">Partner Invoices</field>
+        <field name="model">partner.invoices.report.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <group name="date_range" string="Date">
@@ -14,7 +14,10 @@
                         <field name="date_at" />
                     </group>
                 </group>
-
+                <group name="partner_filter">
+                    <label for="partner_id" />
+                    <field name="partner_id" nolabel="1" options="{'no_create': True}" />
+                </group>
                 <footer>
                     <button
                         name="button_export_html"
@@ -35,17 +38,17 @@
             </form>
         </field>
     </record>
-    <record id="action_dgae_invoices_wizard" model="ir.actions.act_window">
-        <field name="name">Invoices DGAE</field>
-        <field name="res_model">dgae.invoices.report.wizard</field>
+    <record id="action_partner_invoices_wizard" model="ir.actions.act_window">
+        <field name="name">Partner Invoices</field>
+        <field name="res_model">partner.invoices.report.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="dgae_invoices_wizard" />
+        <field name="view_id" ref="partner_invoices_wizard" />
         <field name="target">new</field>
     </record>
 
-    <menuitem name="Rapport DGAE"
-        id="menu_dgae_invoices_wizard"
-        action="action_dgae_invoices_wizard"
+    <menuitem name="Rapport client"
+        id="menu_partner_invoices_wizard"
+        action="action_partner_invoices_wizard"
         sequence="3"
         parent="revatua_connector.revatua_main_menu"
         />

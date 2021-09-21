@@ -38,17 +38,17 @@ msgid "Delivery Address"
 msgstr "Destinataire"
 
 #. module: revatua_armateur
-#: model_terms:ir.ui.view,arch_db:revatua_armateur.dgae_invoices_wizard
+#: model_terms:ir.ui.view,arch_db:revatua_armateur.partner_invoices_wizard
 msgid "View"
 msgstr "Voir"
 
 #. module: revatua_armateur
-#: model:ir.model.fields,field_description:revatua_armateur.field_dgae_invoices_report_wizard__date_at
+#: model:ir.model.fields,field_description:revatua_armateur.field_partner_invoices_report_wizard__date_at
 msgid "Date At"
 msgstr "Au"
 
 #. module: revatua_armateur
-#: model:ir.model.fields,field_description:revatua_armateur.field_dgae_invoices_report_wizard__date_from
+#: model:ir.model.fields,field_description:revatua_armateur.field_partner_invoices_report_wizard__date_from
 msgid "Date From"
 msgstr "Du"
 

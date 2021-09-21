@@ -2,21 +2,21 @@
 <odoo>
 
     <!-- PDF/HMTL REPORTS -->
-    <!-- DGAE Invoices -->
-    <record id="action_print_report_dgae_invoices_qweb" model="ir.actions.report">
-        <field name="name">Report DGAE</field>
-        <field name="model">dgae.invoices.report.wizard</field>
+    <!-- Partner Invoices -->
+    <record id="action_print_report_partner_invoices_qweb" model="ir.actions.report">
+        <field name="name">Report Partner</field>
+        <field name="model">partner.invoices.report.wizard</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">revatua_armateur.dgae_invoices</field>
-        <field name="report_file">revatua_armateur.dgae_invoices</field>
+        <field name="report_name">revatua_armateur.partner_invoices</field>
+        <field name="report_file">revatua_armateur.partner_invoices</field>
     </record>
 
-    <record id="action_print_report_dgae_invoices" model="ir.actions.report">
-        <field name="name">Report DGAE</field>
-        <field name="model">dgae.invoices.report.wizard</field>
+    <record id="action_print_report_partner_invoices" model="ir.actions.report">
+        <field name="name">Report Partner</field>
+        <field name="model">partner.invoices.report.wizard</field>
         <field name="report_type">qweb-html</field>
-        <field name="report_name">revatua_armateur.dgae_invoices</field>
-        <field name="report_file">revatua_armateur.dgae_invoices</field>
+        <field name="report_name">revatua_armateur.partner_invoices</field>
+        <field name="report_file">revatua_armateur.partner_invoices</field>
     </record>
 
 </odoo>

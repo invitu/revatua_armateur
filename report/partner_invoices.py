@@ -8,22 +8,26 @@ from odoo import api, models
 from odoo.tools import float_is_zero
 
 
-class DgaeInvoicesReport(models.AbstractModel):
+class PartnerInvoicesReport(models.AbstractModel):
     # Récupérer les voyages VALIDES entre les dates FROM & TO du wizard puis les connaissements VALIDÉs de ces voyages, puis les factures DGAE liées non-payées
     # Récupérer amount_total dans invoice avec payment_state = is not "paid"
     # dans Saleorder, .. remonter  pour récupérer poids, volume, qté(product_uom_qty) avec toatl à faire en boucle .... à voir
     # dans account.move.line, lien avec sale.order.line
-    _name = "report.revatua_armateur.dgae_invoices"
-    _description = "DGAE Report"
+    _name = "report.revatua_armateur.partner_invoices"
+    _description = "Revatua Client Report"
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        is_dgae = True and (data["partner_id"] == self.env.ref('revatua_connector.partner_dgae').id)
+        partner_id = self.env['res.partner'].search([('id', '=', data["partner_id"])])
         categ_list = self._get_categ_list(data)
 
         return {
-            "doc_model": "dgae.invoices.report.wizard",
+            "doc_model": "partner.invoices.report.wizard",
             "data": data,
             "categ_list": categ_list,
+            "is_dgae": is_dgae,
+            "partner_id": partner_id
         }
 
     def _get_categ_list(self, data):
@@ -31,19 +35,19 @@ class DgaeInvoicesReport(models.AbstractModel):
         Get list of invoices by categ_id
         """
         categ_list = []
-        dgae_id = self.env.ref('revatua_connector.partner_dgae').id
+        partner_id = data["partner_id"]
 
         # Select moves within date range
         if (data['date_from']):
             move_ids = self.env['account.move'].search([
-                ('partner_id', '=', dgae_id),
+                ('partner_id', '=', partner_id),
                 ('invoice_date', '>=', data['date_from']),
                 ('invoice_date', '<=', data['date_at']),
                 ('state',  '=', 'posted')
             ])
         else:
             move_ids = self.env['account.move'].search([
-                ('partner_id', '=', dgae_id),
+                ('partner_id', '=', partner_id),
                 ('invoice_date', '<=', data['date_at']),
                 ('state',  '=', 'posted')
             ])
@@ -98,6 +102,8 @@ class DgaeInvoicesReport(models.AbstractModel):
         Return an object with the connaissement's values
         """
         conn = {}
+        conn['dateFacture'] = sale.date_order
+        conn['numeroFacture'] = sale.name
         conn['numeroVoyage'] = sale.revatua_code
         conn['dateVoyage'] = sale.voyage_id.date_depart
         conn['destination'] = sale.ilearrivee_id.name

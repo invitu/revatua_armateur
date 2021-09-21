@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="revatua_armateur.internal_layout">
-        <div class="o_dgae_invoices_report_page">
+        <div class="o_partner_invoices_report_page">
             <link href="/revatua_armateur/static/src/css/report.css" rel="stylesheet" />
             <t t-raw="0" />
         </div>

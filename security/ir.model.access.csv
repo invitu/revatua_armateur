@@ -6,5 +6,5 @@ access_voyage_revatua_manager,voyage.revatua.manager,model_voyage,revatua_connec
 access_trajet_revatua_user,trajet.revatua.user,model_trajet,revatua_connector.group_revatua_user,1,0,0,0
 access_trajet_revatua_manager,trajet.revatua.manager,model_trajet,revatua_connector.group_revatua_manager,1,1,1,1
 access_wizard_pricelist_get_revatua,access.wizard.pricelist.get.revatua,model_wizard_pricelist_get_revatua,sales_team.group_sale_manager,1,1,1,0
-access_dgae_invoices_report_wizard,access.dgae.invoices.report.wizard,model_dgae_invoices_report_wizard,sales_team.group_sale_manager,1,1,1,0
+access_partner_invoices_report_wizard,access.partner.invoices.report.wizard,model_partner_invoices_report_wizard,sales_team.group_sale_manager,1,1,1,0
 access_duplicate_voyages,access_duplicate_voyages,model_duplicate_voyages,sales_team.group_sale_manager,1,1,1,0
