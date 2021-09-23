@@ -102,17 +102,18 @@ class PartnerInvoicesReport(models.AbstractModel):
         Return an object with the connaissement's values
         """
         conn = {}
-        conn['dateFacture'] = sale.date_order
-        conn['numeroFacture'] = sale.name
+        conn['dateFacture'] = sale.invoice_ids.invoice_date
+        conn['numeroFacture'] = sale.invoice_ids.name
         conn['numeroVoyage'] = sale.revatua_code
         conn['dateVoyage'] = sale.voyage_id.date_depart
         conn['destination'] = sale.ilearrivee_id.name
         conn['destinataire'] = sale.partner_shipping_id.parent_id.name if sale.partner_shipping_id.parent_id.name else sale.partner_shipping_id.name
         conn['numeroTahiti'] = sale.partner_id.vat
-        conn['qty'] = int(sale.order_line[0].product_uom_qty)
-        conn['volume'] = float(sale.order_line[0].volume)
-        conn['poids'] = float(sale.order_line[0].poids)
+        for line in sale.order_line:
+            conn['qty'] = conn['qty'] + float(line.product_uom_qty) if 'qty' in conn else float(line.product_uom_qty)
+            conn['volume'] = conn['volume'] + float(line.volume) if 'volume' in conn else float(line.volume)
+            conn['poids'] = conn['poids'] + float(line.poids) if 'poids' in conn else float(line.poids)
         # taking sale_order's value instead of account_move for we consider each sale_order having the same value as account_move
-        conn['montant'] = int(sale.amount_untaxed)
+        conn['montant'] = float(sale.amount_untaxed)
 
         return conn
