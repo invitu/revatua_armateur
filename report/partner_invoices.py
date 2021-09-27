@@ -61,6 +61,8 @@ class PartnerInvoicesReport(models.AbstractModel):
             key=operator.attrgetter('voyage_id.date_depart'))
 
         for sale in sales:
+            # Note that there must be only one invoice related to a sale_order
+            associated_invoice_id = next(move_id for move_id in move_ids if (move_id.id in sale.invoice_ids.ids))
             # Check if categ_id exists in final list, else create it
             categ_id = sale.order_line[0].product_id.categ_id
             categ_exists = next((i for i, item in enumerate(
@@ -68,21 +70,23 @@ class PartnerInvoicesReport(models.AbstractModel):
 
             if (categ_exists is not None):
                 categ_list[categ_exists]['invoices'] = self._get_invoices(
-                    sale, categ_list[categ_exists]['invoices'])
+                    sale, categ_list[categ_exists]['invoices'], associated_invoice_id)
             else:
                 new_categ = {}
                 new_categ['categ_id'] = categ_id
                 new_categ['invoices'] = self._get_invoices(
-                    sale, [])
+                    sale, [], associated_invoice_id)
                 categ_list.append(new_categ)
 
         return categ_list
 
-    def _get_invoices(self, sale, invoices):
+    def _get_invoices(self, sale, invoices, invoice_id):
         """
         Return invoice's list
         """
         conn = self._get_conn_values(sale)
+        conn['dateFacture'] = invoice_id.invoice_date
+        conn['numeroFacture'] = invoice_id.name
         # Check if a partner_id's list already exists in invoice's list, else create it
         partner_id = sale.partner_id.id
         exists = next((i for i, item in enumerate(
@@ -104,8 +108,6 @@ class PartnerInvoicesReport(models.AbstractModel):
         Return an object with the connaissement's values
         """
         conn = {}
-        conn['dateFacture'] = sale.invoice_ids.invoice_date
-        conn['numeroFacture'] = sale.invoice_ids.name
         conn['numeroVoyage'] = sale.revatua_code
         conn['dateVoyage'] = sale.voyage_id.date_depart
         conn['destination'] = sale.ilearrivee_id.name
