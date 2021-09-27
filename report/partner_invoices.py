@@ -108,7 +108,7 @@ class PartnerInvoicesReport(models.AbstractModel):
         conn['dateVoyage'] = sale.voyage_id.date_depart
         conn['destination'] = sale.ilearrivee_id.name
         conn['destinataire'] = sale.partner_shipping_id.parent_id.name if sale.partner_shipping_id.parent_id.name else sale.partner_shipping_id.name
-        conn['numeroTahiti'] = sale.partner_id.vat
+        conn['numeroTahiti'] = sale.partner_shipping_id.parent_id.vat and sale.partner_shipping_id.parent_id.vat or sale.partner_shipping_id.vat
         for line in sale.order_line:
             conn['qty'] = conn['qty'] + float(line.product_uom_qty) if 'qty' in conn else float(line.product_uom_qty)
             conn['volume'] = conn['volume'] + float(line.volume) if 'volume' in conn else float(line.volume)
