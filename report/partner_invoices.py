@@ -43,12 +43,14 @@ class PartnerInvoicesReport(models.AbstractModel):
                 ('partner_id', '=', partner_id),
                 ('invoice_date', '>=', data['date_from']),
                 ('invoice_date', '<=', data['date_at']),
+                ('payment_state', 'in', ('not_paid', 'partial')),
                 ('state',  '=', 'posted')
             ])
         else:
             move_ids = self.env['account.move'].search([
                 ('partner_id', '=', partner_id),
                 ('invoice_date', '<=', data['date_at']),
+                ('payment_state', 'in', ('not_paid', 'partial')),
                 ('state',  '=', 'posted')
             ])
 
