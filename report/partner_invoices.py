@@ -57,7 +57,10 @@ class PartnerInvoicesReport(models.AbstractModel):
         # Get sales associated to selected moves sorted by date asc
         sales = sorted(
             self.env['sale.order'].search(
-                [('invoice_ids', 'in', move_ids.ids)]),
+                [
+                    ('invoice_ids', 'in', move_ids.ids),
+                    ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
+                ]),
             key=operator.attrgetter('voyage_id.date_depart'))
 
         for sale in sales:
