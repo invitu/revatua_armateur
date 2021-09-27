@@ -228,9 +228,11 @@
     <template id="report_partner_invoices_header">
         <div class="top_header" style="position:relative;min-height: 30px;">
             <div style="float: left;">
-                RELEVÉ DE FACTURES
+                RELEVÉ DE FACTURES du 
+                <t t-esc="data['date_from']" />
+                au 
+                <t t-esc="data['date_at']" />
             </div>
-
             <div style="float: right; width: 40%; text-align: center;">
                 <div>
                     <t t-esc="partner_id['name']" />
