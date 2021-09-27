@@ -46,12 +46,12 @@
                                                 <div class="act_as_cell" style="width: 8%;">Date Facture</div>
                                                 <div class="act_as_cell" style="width: 7%;"># Facture</div>
                                                 <div class="act_as_cell" style="width: 8%;">Date Voyage</div>
-                                                <div class="act_as_cell" style="width: 10%;">N° VOY</div>
+                                                <div class="act_as_cell" style="width: 10%;">N° VOY/CONN</div>
                                                 <div class="act_as_cell" style="width: 17%;">Destinataire</div>
                                             </t>
                                             <t t-else="">
                                                 <div class="act_as_cell" style="width: 10%;">Date Voyage</div>
-                                                <div class="act_as_cell" style="width: 10%;">N° VOY</div>
+                                                <div class="act_as_cell" style="width: 10%;">N° VOY/CONN</div>
                                                 <div class="act_as_cell" style="width: 20%;">Destinataire</div>
                                                 <div class="act_as_cell" style="width: 10%;">N° Tahiti</div>
                                             </t>
