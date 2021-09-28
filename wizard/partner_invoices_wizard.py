@@ -10,8 +10,8 @@ class PartnerInvoicesWizard(models.TransientModel):
     _name = "partner.invoices.report.wizard"
     _description = "Partner Invoices Report Wizard"
 
-    date_at = fields.Date(required=True, default=fields.Date.context_today)
-    date_from = fields.Date(string="Date From")
+    date_at = fields.Date(required=True, default=fields.Date.context_today, help='Saisissez la date de voyage')
+    date_from = fields.Date(string="Date From", help='Saisissez la date de voyage')
 
     def _default_partner(self):
         return self.env.ref('revatua_connector.partner_dgae').id

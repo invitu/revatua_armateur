@@ -38,30 +38,32 @@ class PartnerInvoicesReport(models.AbstractModel):
         partner_id = data["partner_id"]
 
         # Select moves within date range
-        if (data['date_from']):
-            move_ids = self.env['account.move'].search([
-                ('partner_id', '=', partner_id),
-                ('invoice_date', '>=', data['date_from']),
-                ('invoice_date', '<=', data['date_at']),
-                ('payment_state', 'in', ('not_paid', 'partial')),
-                ('state',  '=', 'posted')
-            ])
-        else:
-            move_ids = self.env['account.move'].search([
-                ('partner_id', '=', partner_id),
-                ('invoice_date', '<=', data['date_at']),
-                ('payment_state', 'in', ('not_paid', 'partial')),
-                ('state',  '=', 'posted')
-            ])
+        move_ids = self.env['account.move'].search([
+            ('partner_id', '=', partner_id),
+            ('payment_state', 'in', ('not_paid', 'partial')),
+            ('state',  '=', 'posted')
+        ])
 
         # Get sales associated to selected moves sorted by date asc
-        sales = sorted(
-            self.env['sale.order'].search(
-                [
-                    ('invoice_ids', 'in', move_ids.ids),
-                    ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
-                ]),
-            key=operator.attrgetter('voyage_id.date_depart'))
+        if (data['date_from']):
+            sales = sorted(
+                self.env['sale.order'].search(
+                    [
+                        ('invoice_ids', 'in', move_ids.ids),
+                        ('voyage_id.date_depart', '>=', data['date_from']),
+                        ('voyage_id.date_depart', '<=', data['date_at']),
+                        ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
+                    ]),
+                key=operator.attrgetter('voyage_id.date_depart'))
+        else:
+            sales = sorted(
+                self.env['sale.order'].search(
+                    [
+                        ('invoice_ids', 'in', move_ids.ids),
+                        ('voyage_id.date_depart', '<=', data['date_at']),
+                        ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
+                    ]),
+                key=operator.attrgetter('voyage_id.date_depart'))
 
         for sale in sales:
             # Note that there must be only one invoice related to a sale_order

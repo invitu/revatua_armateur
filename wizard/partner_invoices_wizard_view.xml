@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <!-- AGED PARTNER BALANCE -->
+    <!-- RELEVE DE FACTURES PAR VOYAGE -->
     <record id="partner_invoices_wizard" model="ir.ui.view">
         <field name="name">Partner Invoices</field>
         <field name="model">partner.invoices.report.wizard</field>
         <field name="arch" type="xml">
             <form>
-                <group name="date_range" string="Date">
+                <group name="date_range" string="Dates des voyages">
                     <group>
                         <field name="date_from" />
                     </group>
