@@ -109,11 +109,11 @@ class SaleOrder(models.Model):
         for order in self:
             trajet_from_ids = self.env['trajet'].search([
                 ('ile_depart_id', '=', order.iledepart_id.id),
-                ('date_depart', '>', datetime.now()),
+                ('date_arrivee', '>', datetime.now()),
             ]).ids
             trajet_to_ids = self.env['trajet'].search([
                 ('ile_arrivee_id', '=', order.ilearrivee_id.id),
-                ('date_depart', '>', datetime.now()),
+                ('date_arrivee', '>', datetime.now()),
             ]).ids
 
             voyage_list = self.env['voyage'].search([
