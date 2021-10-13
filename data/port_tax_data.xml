@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="port_tax" model="product.product">
+            <field name="name">Taxe portuaire</field>
+            <field name="purchase_ok" eval="False" />
+            <field name="categ_id" ref="product_cat_fret" />
+            <field name="type">service</field>
+            <field name="list_price">100.0</field>
+        </record>
+    </data>
+</odoo>

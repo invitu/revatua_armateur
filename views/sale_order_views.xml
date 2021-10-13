@@ -90,4 +90,55 @@
             </field>
         </field>
     </record>
+
+    <record id="sale_order_view_form_port_tax" model="ir.ui.view">
+        <field name="name">sale.order.form.view.port.tax</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='partner_id']" position='after'>
+                    <field name="portuary_tax_set" invisible="1" />
+                    <field name="has_tahiti" invisible="1" />
+                    <field name="recompute_portuary_tax" invisible="1" />
+                </xpath>
+                <xpath expr="//group[@name='note_group']" position="before">
+                    <div class="oe_right">
+                        <button
+                            string="Ajouter la taxe portuaire"
+                            name="action_set_portuary_tax"
+                            type="object"
+                            attrs="{'invisible': ['|', '|', '|', ('type_id', '!=', %(revatua_armateur.fret_sale_type)d), ('has_tahiti', '=', False), ('order_line', '=', []), ('portuary_tax_set', '=', True)]}"
+                        />
+                        <button
+                            string="Mettre à jour la taxe portuaire"
+                            name="action_set_portuary_tax"
+                            context="{'carrier_recompute':True}"
+                            type="object"
+                            class="text-warning btn-secondary"
+                            attrs="{'invisible': ['|', '|','|', ('type_id', '!=', %(revatua_armateur.fret_sale_type)d), ('has_tahiti', '=', False), ('recompute_portuary_tax', '=', False), ('portuary_tax_set', '=', False)]}"
+                        />
+                        <button
+                            string="Mettre à jour la taxe portuaire"
+                            name="action_set_portuary_tax"
+                            context="{'carrier_recompute':True}"
+                            type="object"
+                            attrs="{'invisible': ['|', '|','|', ('type_id', '!=', %(revatua_armateur.fret_sale_type)d), ('has_tahiti', '=', False), ('recompute_portuary_tax', '=', True), ('portuary_tax_set', '=', False)]}"
+                        />
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']" position="before">
+                    <field name="recompute_portuary_tax" invisible="1" />
+                    <field name="is_portuary_tax" invisible="1" />
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="before">
+                    <field name="recompute_portuary_tax" invisible="1" />
+                    <field name="is_portuary_tax" invisible="1" />
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                    <attribute name="decoration-warning">recompute_portuary_tax and is_portuary_tax</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
 </odoo>

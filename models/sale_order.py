@@ -88,6 +88,9 @@ class SaleOrder(models.Model):
                           tracking=True,
                           readonly=True)
     correction = fields.Monetary(string='Compensation Fret Mini', store=True, readonly=True, compute='_amount_all')
+    portuary_tax_set = fields.Boolean(compute='_compute_port_tax_state')
+    recompute_portuary_tax = fields.Boolean('La taxe portuaire doit être recalculée')
+    has_tahiti = fields.Boolean("Tahiti's travel place", compute="_compute_has_tahiti")
 
     @api.onchange('partner_invoice_id')
     def onchange_partner_invoice_id(self):
@@ -633,6 +636,86 @@ class SaleOrder(models.Model):
             }
             self._create_error_line(error, line.order_id.id)
 
+    def action_set_portuary_tax(self):
+        self._remove_port_tax_line()
+
+        for order in self:
+            order._create_port_tax_line()
+        return True
+
+    @api.depends('order_line')
+    def _compute_port_tax_state(self):
+        for order in self:
+            order.portuary_tax_set = any(
+                line.is_portuary_tax for line in order.order_line)
+
+    @api.onchange('order_line', 'partner_id')
+    def onchange_order_line(self):
+        port_tax_line = self.order_line.filtered('is_portuary_tax')
+        if port_tax_line:
+            self.recompute_portuary_tax = True
+
+    def _create_port_tax_line(self):
+        port_tax_minimum_value = self.env.company.port_tax_minimum_value
+
+        if (port_tax_minimum_value <= self.amount_total):
+            SaleOrderLine = self.env['sale.order.line']
+            
+            port_tax_id = self.env.ref('revatua_armateur.port_tax')
+            volume = 0.0
+            poids = 0.0
+            for line in self.order_line:
+                volume += line.volume
+                poids += line.poids
+            values = {
+                'order_id': self.id,
+                'name': port_tax_id.name,
+                'product_uom_qty': (poids / 1000 > volume) and (poids / 1000) or volume,
+                'product_uom': '1',
+                'product_id': port_tax_id.id,
+                'tax_id': False,
+                'is_portuary_tax': True,
+                'price_unit': port_tax_id.list_price,
+                'poids': poids,
+                'volume': volume
+            }
+
+            if self.order_line:
+                values['sequence'] = self.order_line[-1].sequence + 1
+            sol = SaleOrderLine.sudo().create(values)
+            # return True
+            return sol
+        else:
+            raise UserError(
+                _('Impossible de créer une taxe portuaire, le total étant inférieur au minimum requis : %s') % (port_tax_minimum_value))
+
+
+    def _remove_port_tax_line(self):
+        """
+        Remove port_tax products from the sales order
+        """
+        port_tax_lines = self.env['sale.order.line'].search([('order_id', 'in', self.ids), ('is_portuary_tax', '=', True)])
+        if not port_tax_lines:
+            return
+        to_delete = port_tax_lines.filtered(lambda x: x.qty_invoiced == 0)
+        if not to_delete:
+            raise UserError(
+                _('You can not update the tax cost on an order where it was already invoiced!\n\nThe following tax costs lines (product, invoiced quantity and price) have already been processed:\n\n')
+                + '\n'.join(['- %s: %s x %s' % (line.product_id.with_context(display_default_code=False).display_name, line.qty_invoiced, line.price_unit) for line in port_tax_lines])
+            )
+        to_delete.unlink()
+        self.recompute_portuary_tax = False
+
+    def _is_port_tax(self):
+        self.ensure_one()
+        return self.is_portuary_tax
+
+    @api.depends('iledepart_id', 'ilearrivee_id')
+    def _compute_has_tahiti(self):
+        tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
+
+        for so in self:
+            so.has_tahiti = True and tahiti_id in (self.iledepart_id.id, self.ilearrivee_id.id)
 
 
 class SaleOrderLine(models.Model):
@@ -669,6 +752,8 @@ class SaleOrderLine(models.Model):
     official_price = fields.Boolean(string='Official Price',
                                     readonly=True,
                                     default=False)
+    is_portuary_tax = fields.Boolean(string="Is a port tax", default=False)
+    recompute_portuary_tax = fields.Boolean(related='order_id.recompute_portuary_tax')
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
