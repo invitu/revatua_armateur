@@ -102,7 +102,7 @@ class PartnerInvoicesReport(models.AbstractModel):
         else:
             invoice = {}
             invoice['partner_id'] = partner_id
-            invoice['expediteur'] = sale.partner_id.parent_id.name if sale.partner_id.parent_id.name else sale.partner_id.name
+            invoice['expediteur'] = sale.partner_id.parent_id.name and sale.partner_id.parent_id.name or sale.partner_id.name
             invoice['connaissements'] = [conn]
             invoices.append(invoice)
 
@@ -112,17 +112,21 @@ class PartnerInvoicesReport(models.AbstractModel):
         """
         Return an object with the connaissement's values
         """
+        port_tax = 0.0
         conn = {}
         conn['numeroVoyage'] = sale.revatua_code
         conn['dateVoyage'] = sale.voyage_id.date_depart
         conn['destination'] = sale.ilearrivee_id.name
-        conn['destinataire'] = sale.partner_shipping_id.parent_id.name if sale.partner_shipping_id.parent_id.name else sale.partner_shipping_id.name
+        conn['destinataire'] = sale.partner_shipping_id.parent_id.name and sale.partner_shipping_id.parent_id.name or sale.partner_shipping_id.name
         conn['numeroTahiti'] = sale.partner_shipping_id.parent_id.vat and sale.partner_shipping_id.parent_id.vat or sale.partner_shipping_id.vat
         for line in sale.order_line:
-            conn['qty'] = conn['qty'] + float(line.product_uom_qty) if 'qty' in conn else float(line.product_uom_qty)
-            conn['volume'] = conn['volume'] + float(line.volume) if 'volume' in conn else float(line.volume)
-            conn['poids'] = conn['poids'] + float(line.poids) if 'poids' in conn else float(line.poids)
+            if line.is_portuary_tax:
+                port_tax = line.price_subtotal
+            else:
+                conn['qty'] = ('qty' in conn) and (conn['qty'] + float(line.product_uom_qty)) or float(line.product_uom_qty)
+                conn['volume'] = ('volume' in conn) and (conn['volume'] + float(line.volume)) or float(line.volume)
+                conn['poids'] = ('poids' in conn ) and (conn['poids'] + float(line.poids)) or float(line.poids)
         # taking sale_order's value instead of account_move for we consider each sale_order having the same value as account_move
-        conn['montant'] = float(sale.amount_untaxed)
+        conn['montant'] = float(sale.amount_untaxed) - port_tax
 
         return conn

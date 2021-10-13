@@ -131,7 +131,7 @@ class SaleOrder(models.Model):
     def update_prices(self):
         self.ensure_one()
         if self.pricelist_id.type == 'fret':
-            for line in self.order_line.filtered(lambda line: not line.display_type):
+            for line in self.order_line.filtered(lambda line: line.product_id.is_fret):
                 line.product_id_volume_poids_change()
             self.show_update_pricelist = False
             self.message_post(body=_("Product prices have been recomputed according to pricelist <b>%s<b> ", self.pricelist_id.display_name))
@@ -153,7 +153,7 @@ class SaleOrder(models.Model):
     def _get_order_lines(self):
         lines = []
         for line in self.order_line:
-            if not line.display_type:
+            if line.product_id.is_fret:
                 datas = {}
                 if line.unit_compute:
                     poidstotal = line.poids * line.product_uom_qty
@@ -595,11 +595,15 @@ class SaleOrder(models.Model):
         """
         Check inconsistence between Revatua and Odoo product's subtotal
         """
-        if (rev_order['montantTotal'] and rev_order['montantTotal'] < self.amount_untaxed):
+        amount_untaxed = self.amount_untaxed
+        if (self.portuary_tax_set):
+            port_tax = next(line.price_subtotal for line in self.order_line if line.is_portuary_tax)
+            amount_untaxed -= port_tax
+        if (rev_order['montantTotal'] and rev_order['montantTotal'] < amount_untaxed):
             error = {
                 'display_type': 'line_note',
                 'name': _('ATTENTION Problem on connaissement untaxed price: odoo price %(odoo_price)d is higher than revatua max price %(revatua_price)d.',
-                          odoo_price=self.amount_untaxed,
+                          odoo_price=amount_untaxed,
                           revatua_price=rev_order['montantTotal'],
                           )
             }
