@@ -39,7 +39,9 @@ class PartnerInvoicesReport(models.AbstractModel):
 
         # Select moves within date range
         move_ids = self.env['account.move'].search([
+            '|',
             ('partner_id', '=', partner_id),
+            ('partner_id', 'child_of', partner_id),
             ('payment_state', 'in', ('not_paid', 'partial')),
             ('state',  '=', 'posted')
         ])
