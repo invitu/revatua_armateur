@@ -92,6 +92,12 @@ class PartnerInvoicesReport(models.AbstractModel):
         conn = self._get_conn_values(sale)
         conn['dateFacture'] = invoice_id.invoice_date
         conn['numeroFacture'] = invoice_id.name
+        conn['montant'] = float(invoice_id.amount_total)
+        if (invoice_id.partner_id == self.env.ref('revatua_connector.partner_dgae')):
+            port_tax = next((line.price_subtotal for line in invoice_id.invoice_line_ids
+                             if line.product_id == self.env.ref('revatua_armateur.port_tax')), 0.0)
+            conn['montant'] -= port_tax
+
         # Check if a partner_id's list already exists in invoice's list, else create it
         partner_id = sale.partner_id.id
         exists = next((i for i, item in enumerate(
@@ -112,7 +118,6 @@ class PartnerInvoicesReport(models.AbstractModel):
         """
         Return an object with the connaissement's values
         """
-        port_tax = 0.0
         conn = {}
         conn['numeroVoyage'] = sale.revatua_code
         conn['dateVoyage'] = sale.voyage_id.date_depart
@@ -120,13 +125,12 @@ class PartnerInvoicesReport(models.AbstractModel):
         conn['destinataire'] = sale.partner_shipping_id.parent_id.name and sale.partner_shipping_id.parent_id.name or sale.partner_shipping_id.name
         conn['numeroTahiti'] = sale.partner_shipping_id.parent_id.vat and sale.partner_shipping_id.parent_id.vat or sale.partner_shipping_id.vat
         for line in sale.order_line:
-            if line.is_portuary_tax:
-                port_tax = line.price_subtotal
-            else:
-                conn['qty'] = ('qty' in conn) and (conn['qty'] + float(line.product_uom_qty)) or float(line.product_uom_qty)
-                conn['volume'] = ('volume' in conn) and (conn['volume'] + float(line.volume)) or float(line.volume)
-                conn['poids'] = ('poids' in conn ) and (conn['poids'] + float(line.poids)) or float(line.poids)
-        # taking sale_order's value instead of account_move for we consider each sale_order having the same value as account_move
-        conn['montant'] = float(sale.amount_untaxed) - port_tax
+            if line.product_id.is_fret:
+                conn['qty'] = ('qty' in conn) and (
+                    conn['qty'] + float(line.product_uom_qty)) or float(line.product_uom_qty)
+                conn['volume'] = ('volume' in conn) and (
+                    conn['volume'] + float(line.volume)) or float(line.volume)
+                conn['poids'] = ('poids' in conn) and (
+                    conn['poids'] + float(line.poids)) or float(line.poids)
 
         return conn
