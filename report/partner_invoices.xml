@@ -111,12 +111,12 @@
                                             </div>
                                             <!--## nb colis -->
                                             <div class="act_as_cell">
-                                                <span t-esc="conn['qty']" />
+                                                <span t-esc="'%.0f'% conn['qty']" />
                                                 <t t-set="total_nb_colis" t-value="total_nb_colis+conn['qty']" />
                                             </div>
                                             <!--## poids -->
                                             <div class="act_as_cell">
-                                                <span t-esc="'%.3f'% conn['poids']" />
+                                                <span t-esc="'%.0f'% conn['poids']" />
                                                 <t t-set="total_poids" t-value="total_poids + conn['poids']" />
                                             </div>
                                             <!--## volume -->
@@ -147,10 +147,10 @@
                                         </t>
                                         <div class="act_as_cell total_value" style="width: 10%;">TOTAUX</div>
                                         <div class="act_as_cell total_value" style="width: 5%;">
-                                            <span t-esc="total_nb_colis" />
+                                            <span t-esc="'%.0f'% total_nb_colis" />
                                         </div>
                                         <div class="act_as_cell total_value" style="width: 10%;">
-                                            <span t-esc="'%.3f'% total_poids" />
+                                            <span t-esc="'%.0f'% total_poids" />
                                             <t t-set="full_total_poids" t-value="total_poids + full_total_poids" />
                                         </div>
                                         <div class="act_as_cell total_value" style="width: 10%;">
@@ -174,7 +174,7 @@
                                     <div class="act_as_cell" style="width: 10%;" />
                                     <div class="act_as_cell full_total_header" style="width: 15%;">TOTAUX</div>
                                     <div class="act_as_cell full_total_value" style="width: 10%;">
-                                        <span t-esc="'%.3f'% full_total_poids" />
+                                        <span t-esc="'%.0f'% full_total_poids" />
                                     </div>
                                     <div class="act_as_cell full_total_value" style="width: 10%;">
                                         <span t-esc="'%.3f'% full_total_volume" />
