@@ -6,8 +6,8 @@
     'description': """
 Ce module permet de gérer les ventes de fret, en connection avec Revatua
 """,
-    'author': 'EASYPME, Luce PASQUINI, Cyril Vinh Tung ',
-    'website': 'http://www.easypme.com',
+    'author': 'INVITU',
+    'website': 'http://www.invitu.com',
 
     'category': 'Module',
     'version': '1.0',
