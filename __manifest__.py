@@ -20,6 +20,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
         'revatua_connector',
         'sale_order_type',
         'web_domain_field',
+        'sale_stock',
     ],
 
     # always loaded
@@ -44,6 +45,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
         'views/product_pricelist_views.xml',
         'views/product_views.xml',
         'views/res_company_views.xml',
+        'views/stock_picking_views.xml',
         'report/reports.xml',
         "report/layout.xml",
         'report/partner_invoices.xml',

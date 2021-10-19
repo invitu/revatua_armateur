@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="vpicktree_freight_view_tree" model="ir.ui.view">
+        <field name="name">stock.picking.tree.inherit.freight</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='scheduled_date']" position="after">
+                <field name="total_product_uom_qty" optional="show" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_picking_freight_kanban" model="ir.ui.view">
+        <field name="name">stock.picking.kanban.inherit.freight</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.stock_picking_kanban" />
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-name='kanban-box']//field[@name='state']" position="before">
+                <field name="total_product_uom_qty" widget="label_selection" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="filter_now_view_picking_internal_search" model="ir.ui.view">
+        <field name="name">stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='late']" position="before">
+                <filter name="on_time" string="À l'heure"
+                    domain="[('state', 'in', ('assigned', 'waiting', 'confirmed')), ('scheduled_date', '&lt;', datetime.datetime.now() + datetime.timedelta(hours=1))]" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
