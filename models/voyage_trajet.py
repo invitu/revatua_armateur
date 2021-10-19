@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields, models, api
+from odoo.exceptions import UserError
 from datetime import datetime
 import pytz
 import base64
@@ -215,6 +216,11 @@ class Voyage(models.Model):
 
     def action_done(self):
         timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
+        # We check if the voyage's sale orders are all loaded through their picking state
+        so_not_all_loaded = any(picking.picking_type_id.code == 'internal' and picking.state not in ('done', 'cancel')
+                                    for picking in self.order_ids.picking_ids)
+        if so_not_all_loaded:
+            raise UserError('Attention, il reste des connaissements non-embarqués')
         # We check if the voyage has Tahiti in Trajets
         has_tahiti = False
         for trajet in self.trajet_ids:
