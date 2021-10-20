@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from itertools import groupby
+from odoo.exceptions import UserError
 
 
 class Picking(models.Model):
@@ -37,3 +39,37 @@ class Picking(models.Model):
                         elif picking.picking_type_id.code == 'outgoing':
                             picking.scheduled_date = arrival_date
                         break
+
+    def _action_done(self):
+        for picking in self:
+            if (picking.picking_type_id.code == 'internal' and picking.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
+                url = "connaissements/" + picking.sale_id.id_revatua + "/changeretat"
+                payload = {
+                    "evenementConnaissementEnum": "EMBARQUE",
+                    "nbColisPresent": picking.total_product_uom_qty
+                }
+                self.env['revatua.api'].api_patch(url, payload)
+        return super(Picking, self)._action_done()
+
+    def button_validate(self):
+        for picking in self:
+            if (picking.picking_type_id.code == 'internal' and picking.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
+                # Group lines by product_id to compare their quantities
+                grouped_picking = self._group_dict(
+                    picking.move_line_ids, lambda x: x.product_id)
+                grouped_sales = self._group_dict(
+                    picking.sale_id.order_line, lambda x: x.product_id)
+                if grouped_picking != grouped_sales:
+                    raise UserError(
+                        _("Attention, il y a une différence de quantité des produits entre le connaissement et le bon de livraison."
+                          + "\nVeuillez régulariser cette différence pour continuer."))
+
+        return super(Picking, self).button_validate()
+
+    def _group_dict(self, element, keyfunc):
+        grouped_element = {}
+        sorted_element = sorted(element, key=keyfunc)
+        for k, g in groupby(sorted_element, key=keyfunc):
+            if k.is_fret and k.type in ('consu', 'product'):
+                grouped_element[k] = sum(r['product_uom_qty'] for r in list(g))
+        return grouped_element
