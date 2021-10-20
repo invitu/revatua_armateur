@@ -215,7 +215,6 @@ class Voyage(models.Model):
             voyage.state = 'confirm'
 
     def action_done(self):
-        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         # We check if the voyage's sale orders are all loaded through their picking state
         so_not_all_loaded = any(picking.picking_type_id.code == 'internal' and picking.state not in ('done', 'cancel')
                                     for picking in self.order_ids.picking_ids)
@@ -241,7 +240,7 @@ class Voyage(models.Model):
                     url = 'voyages/' + self.name + '/trajets/' + str(periple['id']) + '/manifeste'
                     manifest_response = self.env['revatua.api'].api_patch(
                         url, {"mdp": revatua_certif_pwd})
-
+                    timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
                     self.env['ir.attachment'].create({
                         'name': 'manifest_' + self.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
                         'type': 'binary',
