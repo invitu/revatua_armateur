@@ -215,41 +215,42 @@ class Voyage(models.Model):
             voyage.state = 'confirm'
 
     def action_done(self):
+        for voyage in self:
         # We check if the voyage's sale orders are all loaded through their picking state
-        so_not_all_loaded = any(picking.picking_type_id.code == 'internal' and picking.state not in ('done', 'cancel')
-                                    for picking in self.order_ids.picking_ids)
-        if so_not_all_loaded:
-            raise UserError('Attention, il reste des connaissements non-embarqués')
-        # We check if the voyage has Tahiti in Trajets
-        has_tahiti = False
-        for trajet in self.trajet_ids:
-            tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
-            if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
-                has_tahiti = True
+            so_not_all_loaded = any(picking.picking_type_id.code == 'internal' and picking.state not in ('done', 'cancel')
+                                        for picking in voyage.order_ids.picking_ids)
+            if so_not_all_loaded:
+                raise UserError('Attention, il reste des connaissements non-embarqués')
+            # We check if the voyage has Tahiti in Trajets
+            has_tahiti = False
+            for trajet in voyage.trajet_ids:
+                tahiti_id = self.env.ref('l10n_pf_islands.state_pf_44').id
+                if tahiti_id in (trajet.ile_depart_id.id, trajet.ile_arrivee_id.id):
+                    has_tahiti = True
 
-        if has_tahiti:
-            revatua_certif_pwd = self.env.company.revatua_certif_pwd
-            # Get Revatua's periple/trajet ids
-            url = 'voyages/' + self.name + '/periples'
-            periples_response = self.env['revatua.api'].api_get(url)
-            for periple in periples_response.json():
-                # Everytime 'Tahiti' is in the trajet, request a manifest
-                if 29 in (periple['ileDepart']['id'], periple['ileArrivee']['id']):
-                    departure_arrival_status = 'depart' if (
-                        periple['ileDepart']['nom'] == 'Tahiti') else 'arrivee'
-                    url = 'voyages/' + self.name + '/trajets/' + str(periple['id']) + '/manifeste'
-                    manifest_response = self.env['revatua.api'].api_patch(
-                        url, {"mdp": revatua_certif_pwd})
-                    timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
-                    self.env['ir.attachment'].create({
-                        'name': 'manifest_' + self.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
-                        'type': 'binary',
-                        'datas': base64.b64encode(manifest_response.content),
-                        'res_model': 'voyage',
-                        'res_id': self.id,
-                        'mimetype': 'application/pdf'
-                    })
-        self.state = 'done'
+            if has_tahiti:
+                revatua_certif_pwd = self.env.company.revatua_certif_pwd
+                # Get Revatua's periple/trajet ids
+                url = 'voyages/' + voyage.name + '/periples'
+                periples_response = self.env['revatua.api'].api_get(url)
+                for periple in periples_response.json():
+                    # Everytime 'Tahiti' is in the trajet, request a manifest
+                    if 29 in (periple['ileDepart']['id'], periple['ileArrivee']['id']):
+                        departure_arrival_status = 'depart' if (
+                            periple['ileDepart']['nom'] == 'Tahiti') else 'arrivee'
+                        url = 'voyages/' + voyage.name + '/trajets/' + str(periple['id']) + '/manifeste'
+                        manifest_response = self.env['revatua.api'].api_patch(
+                            url, {"mdp": revatua_certif_pwd})
+                        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
+                        self.env['ir.attachment'].create({
+                            'name': 'manifest_' + voyage.name + '_' + departure_arrival_status + '_' + datetime.now().astimezone(timezone).strftime("%Y-%m-%d %H-%M-%S"),
+                            'type': 'binary',
+                            'datas': base64.b64encode(manifest_response.content),
+                            'res_model': 'voyage',
+                            'res_id': voyage.id,
+                            'mimetype': 'application/pdf'
+                        })
+            voyage.state = 'done'
 
     def action_cancel(self):
         if self.name:
