@@ -47,7 +47,7 @@
                         <filter string="Customer" name="partner_id" context="{'group_by':'partner_id'}" />
                         <filter string="Company" name="company_id" groups="base.group_multi_company" context="{'group_by':'company_id'}" />
                         <filter string="Shipping Customer" name="partner_shipping_id" context="{'group_by':'partner_shipping_id'}" />
-                        <filter string="Delivered Customer" name="partner_invoice_id" context="{'group_by':'partner_invoice_id'}" />
+                        <filter string="Invoiced Customer" name="partner_invoice_id" context="{'group_by':'partner_invoice_id'}" />
                         <filter string="Customer State" name="state_id" context="{'group_by':'state_id'}" />
                         <separator />
                         <filter string="Order #" name="order_id" context="{'group_by':'order_id'}" />

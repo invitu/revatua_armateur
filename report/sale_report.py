@@ -23,7 +23,7 @@ class SaleFretReport(models.Model):
     partner_shipping_id = fields.Many2one(
         'res.partner', 'Shipping Customer', readonly=True)
     partner_invoice_id = fields.Many2one(
-        'res.partner', 'Delivered Customer', readonly=True)
+        'res.partner', 'Invoiced Customer', readonly=True)
     product_tmpl_id = fields.Many2one(
         'product.template', 'Product', readonly=True)
     categ_id = fields.Many2one(
