@@ -49,7 +49,7 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
         'report/reports.xml',
         "report/layout.xml",
         'report/partner_invoices.xml',
-        'report/sale_report.xml',
+        'report/sale_fret_report.xml',
         #'views/revatua_menu_views.xml',
         #'views/voyage_views.xml',
         #'views/res_company_views.xml',
