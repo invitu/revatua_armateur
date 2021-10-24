@@ -35,9 +35,9 @@ class SaleFretReport(models.Model):
     volume = fields.Float('Volume (m3)', readonly=True)
     volume_best = fields.Float(
         'Volume au plus avantageux (m3)', readonly=True)
-    poids = fields.Float('Poids (kg)', readonly=True)
+    poids = fields.Float('Poids (t)', readonly=True)
     poids_best = fields.Float(
-        'Poids au plus avantageux (kg)', readonly=True)
+        'Poids au plus avantageux (t)', readonly=True)
     voyage_id = fields.Many2one('voyage', readonly=True)
     date_voyage = fields.Datetime('Date de depart', readonly=True)
     iledepart_id = fields.Many2one('res.country.state',
@@ -81,10 +81,10 @@ class SaleFretReport(models.Model):
             t.categ_id as categ_id,
             p.product_tmpl_id,
             partner.state_id as state_id,
-            CASE WHEN l.product_id IS NOT NULL THEN sum(l.poids) ELSE 0 END as poids,
+            CASE WHEN l.product_id IS NOT NULL THEN sum(l.poids)/1000 ELSE 0 END as poids,
             CASE WHEN l.product_id IS NOT NULL THEN sum(l.volume) ELSE 0 END as volume,
             CASE WHEN l.product_id IS NOT NULL AND NOT s.poids_best THEN sum(l.volume) ELSE 0 END AS volume_best,
-            CASE WHEN l.product_id IS NOT NULL AND s.poids_best THEN sum(l.poids) ELSE 0 END AS poids_best,
+            CASE WHEN l.product_id IS NOT NULL AND s.poids_best THEN sum(l.poids)/1000 ELSE 0 END AS poids_best,
             s.id as order_id
         """
 
