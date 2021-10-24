@@ -91,6 +91,9 @@ class SaleOrder(models.Model):
     portuary_tax_set = fields.Boolean(compute='_compute_port_tax_state')
     recompute_portuary_tax = fields.Boolean('La taxe portuaire doit être recalculée')
     has_tahiti = fields.Boolean("Tahiti's travel place", compute="_compute_has_tahiti")
+    poids_best = fields.Boolean('Poids Avantageux', compute='_compute_best_weight',
+                                store=True,
+                                help='True if the total weight of the connaissement is higher than the total volume')
 
     @api.onchange('partner_invoice_id')
     def onchange_partner_invoice_id(self):
@@ -106,6 +109,16 @@ class SaleOrder(models.Model):
                 'payment_term_id': self.partner_invoice_id.property_payment_term_id.id,
             }
             self.update(values)
+
+    @api.depends('order_line')
+    def _compute_best_weight(self):
+        for order in self:
+            poids = volume = 0.0
+            for line in order.order_line:
+                if line.product_id.is_fret:
+                    poids += float(line.poids)
+                    volume += float(line.volume)
+            order.poids_best = (poids / 1000) >= volume and True or False
 
     @api.depends('iledepart_id', 'ilearrivee_id')
     def _compute_voyage_id_domain(self):
@@ -664,7 +677,7 @@ class SaleOrder(models.Model):
 
         if (port_tax_minimum_value <= self.amount_total):
             SaleOrderLine = self.env['sale.order.line']
-            
+
             port_tax_id = self.env.ref('revatua_armateur.port_tax')
             volume = 0.0
             poids = 0.0
@@ -692,7 +705,6 @@ class SaleOrder(models.Model):
         else:
             raise UserError(
                 _('Impossible de créer une taxe portuaire, le total étant inférieur au minimum requis : %s') % (port_tax_minimum_value))
-
 
     def _remove_port_tax_line(self):
         """
