@@ -1,4 +1,7 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# Copyright 2021 INVITU - Cyril VINH-TUNG
+# Copyright 2021 INVITU - Kevin MASSON
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 {
     'name': "Revatua Armateur",
 
@@ -58,4 +61,5 @@ Ce module permet de gérer les ventes de fret, en connection avec Revatua
     'demo': [
     ],
     'installable': True,
+    'license': 'AGPL-3',
 }
