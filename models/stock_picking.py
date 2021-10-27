@@ -55,7 +55,8 @@ class Picking(models.Model):
         for picking in self:
             if (picking.picking_type_id.code == 'internal' and picking.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
                 # Check if differences btw reserved & done
-                if any(picking.product_uom_qty != picking.qty_done for picking in picking.move_line_ids):
+                if (any(picking.qty_done != 0 for picking in picking.move_line_ids)
+                        and any(picking.product_uom_qty != picking.qty_done for picking in picking.move_line_ids)):
                     self._qty_error()
                 # Group lines by product_id to compare their quantities
                 grouped_picking = self._group_dict(
