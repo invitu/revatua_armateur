@@ -59,19 +59,17 @@ class Picking(models.Model):
                         and any(picking.product_uom_qty != picking.qty_done for picking in picking.move_line_ids)):
                     self._qty_error()
                 # Group lines by product_id to compare their quantities
-                grouped_picking = self._group_dict(
-                    picking.move_line_ids, lambda x: x.product_id)
-                grouped_sales = self._group_dict(
-                    picking.sale_id.order_line, lambda x: x.product_id)
+                grouped_picking = self._group_dict(picking.move_line_ids)
+                grouped_sales = self._group_dict(picking.sale_id.order_line)
                 if grouped_picking != grouped_sales:
                     self._qty_error()
 
         return super(Picking, self).button_validate()
 
-    def _group_dict(self, element, keyfunc):
+    def _group_dict(self, element):
         grouped_element = {}
-        sorted_element = sorted(element, key=keyfunc)
-        for k, g in groupby(sorted_element, key=keyfunc):
+        sorted_element = sorted(element, key=lambda x: x.product_id.id)
+        for k, g in groupby(sorted_element, key=lambda x: x.product_id):
             if k.is_fret and k.type in ('consu', 'product'):
                 grouped_element[k] = sum(r['product_uom_qty'] for r in list(g))
         return grouped_element
