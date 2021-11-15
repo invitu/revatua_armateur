@@ -32,8 +32,11 @@ class Picking(models.Model):
                     lambda trajet: trajet.ile_arrivee_id == picking.sale_id.ilearrivee_id), key=lambda x: x.date_arrivee)
                 for trajet in arrival_trajet_ids:
                     arrival_date = trajet.date_arrivee
-                    depart_date = max([i.date_depart for i in depart_trajets_ids if i.date_depart <= arrival_date])
-                    if (depart_date):
+                    depart_date = max(
+                        [i.date_depart for i in depart_trajets_ids if i.date_depart <= arrival_date],
+                        default=0
+                    )
+                    if (depart_date is not 0):
                         if picking.picking_type_id.code == 'internal':
                             picking.scheduled_date = depart_date
                         elif picking.picking_type_id.code == 'outgoing':
