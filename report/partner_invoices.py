@@ -2,10 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import operator
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 
 from odoo import api, models
 from odoo.tools import float_is_zero
+import pytz
 
 
 class PartnerInvoicesReport(models.AbstractModel):
@@ -47,13 +48,16 @@ class PartnerInvoicesReport(models.AbstractModel):
         ])
 
         # Get sales associated to selected moves sorted by date asc
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         if (data['date_from']):
             sales = sorted(
                 self.env['sale.order'].search(
                     [
                         ('invoice_ids', 'in', move_ids.ids),
-                        ('voyage_id.date_depart', '>=', data['date_from']),
-                        ('voyage_id.date_depart', '<=', data['date_at']),
+                        ('voyage_id.date_depart', '>=', datetime.combine(datetime.strptime(
+                            data['date_from'], '%Y-%m-%d'), time.min).replace(tzinfo=timezone).astimezone(pytz.timezone('UTC'))),
+                        ('voyage_id.date_depart', '<=', datetime.combine(datetime.strptime(
+                            data['date_at'], '%Y-%m-%d'), time.max).replace(tzinfo=timezone).astimezone(pytz.timezone('UTC'))),
                         ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
                     ]),
                 key=operator.attrgetter('voyage_id.date_depart'))
@@ -62,7 +66,8 @@ class PartnerInvoicesReport(models.AbstractModel):
                 self.env['sale.order'].search(
                     [
                         ('invoice_ids', 'in', move_ids.ids),
-                        ('voyage_id.date_depart', '<=', data['date_at']),
+                        ('voyage_id.date_depart', '<=', datetime.combine(datetime.strptime(
+                            data['date_at'], '%Y-%m-%d'), time.max).replace(tzinfo=timezone).astimezone(pytz.timezone('UTC'))),
                         ('type_id', '=', self.env.ref('revatua_armateur.fret_sale_type').id),
                     ]),
                 key=operator.attrgetter('voyage_id.date_depart'))
@@ -120,9 +125,10 @@ class PartnerInvoicesReport(models.AbstractModel):
         """
         Return an object with the connaissement's values
         """
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz or 'UTC')
         conn = {}
         conn['numeroVoyage'] = sale.revatua_code
-        conn['dateVoyage'] = sale.voyage_id.date_depart
+        conn['dateVoyage'] = sale.voyage_id.date_depart.astimezone(timezone)
         conn['destination'] = sale.ilearrivee_id.name
         conn['destinataire'] = sale.partner_shipping_id.parent_id.name and sale.partner_shipping_id.parent_id.name or sale.partner_shipping_id.name
         conn['numeroTahiti'] = sale.partner_shipping_id.parent_id.vat and sale.partner_shipping_id.parent_id.vat or sale.partner_shipping_id.vat
