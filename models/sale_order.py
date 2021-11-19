@@ -569,6 +569,8 @@ class SaleOrder(models.Model):
                 product_id = self.env['product.product'].create({
                     'name': values['description'],
                     'taxes_id': False,
+                    'active': False,
+                    'is_fret': True,
                     'matiere_dangereuse': values['matiereDangereuse'],
                     'purchase_ok': False,
                     'nomenclaturepfcustoms_id': self.env['nomenclature.pf.customs'].search([
