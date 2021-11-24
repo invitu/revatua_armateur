@@ -19,6 +19,7 @@
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
+            <field name="dgae_supported" eval="1"/>
         </record>
         <record id="product_cat_espcubi" model="product.category">
             <field name="code_revatua">ESPCUBI</field>
@@ -61,6 +62,7 @@
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
+            <field name="dgae_supported" eval="1"/>
         </record>
         <record id="product_cat_futvide" model="product.category">
             <field name="code_revatua">FUTVIDE</field>
@@ -131,6 +133,7 @@
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
+            <field name="dgae_supported" eval="1"/>
         </record>
         <record id="product_cat_pgc" model="product.category">
             <field name="code_revatua">PGC</field>
@@ -145,6 +148,7 @@
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
+            <field name="dgae_supported" eval="1"/>
         </record>
         <record id="product_cat_ppn" model="product.category">
             <field name="code_revatua">PPN</field>
@@ -152,6 +156,7 @@
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
+            <field name="dgae_supported" eval="1"/>
         </record>
     </data>
 </odoo>
