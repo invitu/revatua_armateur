@@ -22,8 +22,10 @@
         <record id="full_fut_200L" model="product.product">
             <field name="name">Essence ou Pétrole Fût 200L plein</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
             <field name="volume">0.2</field>
             <field name="weight">200</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_espft"/>
@@ -32,6 +34,7 @@
         <record id="empty_fut_200L" model="product.product">
             <field name="name">Fût 200L vide</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="volume">0.2</field>
@@ -42,8 +45,10 @@
         <record id="full_touque_20L" model="product.product">
             <field name="name">Essence ou Pétrole Touque 20L pleine</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
             <field name="volume">0.02</field>
             <field name="weight">20</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_esptq"/>
@@ -52,8 +57,10 @@
         <record id="full_bouteillegaz_13KG" model="product.product">
             <field name="name">Bouteille de gaz 13 kg pleine</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
             <field name="volume">0.0522</field>
             <field name="weight">28</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
@@ -62,6 +69,7 @@
         <record id="empty_bouteillegaz_13KG" model="product.product">
             <field name="name">Bouteille de gaz 13 kg vide</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="volume">0.0522</field>
@@ -72,8 +80,10 @@
         <record id="full_bouteillegaz_50KG" model="product.product">
             <field name="name">Bouteille de gaz 50 kg pleine</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
             <field name="volume">0.1805</field>
             <field name="weight">83.5</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
@@ -82,6 +92,7 @@
         <record id="empty_bouteillegaz_50KG" model="product.product">
             <field name="name">Bouteille de gaz 50 kg vide</field>
             <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="volume">0.1805</field>
@@ -89,5 +100,186 @@
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73110000"/>
         </record>
+
+        <record id="product_product_fret_0" model="product.product">
+            <field name="name">Autres marchandises générales</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_autre"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_07101000"/>
+        </record>
+
+        <record id="product_product_fret_1" model="product.product">
+            <field name="name">Coprah</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_coprah"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_12030000"/>
+        </record>
+
+        <record id="product_product_fret_2" model="product.product">
+            <field name="name">Gaz transporté dans un autre conteneur (cubitainer)</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazcubi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
+        </record>
+
+        <record id="product_product_fret_3" model="product.product">
+            <field name="name">Gaz vrac en camion citerne</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazcamion"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
+        </record>
+
+        <record id="product_product_fret_4" model="product.product">
+            <field name="name">Gazole ou Essence en camion citerne</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_hydrociterne"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101925"/>
+        </record>
+
+        <record id="product_product_fret_5" model="product.product">
+            <field name="name">Gazole vrac ou conditionné</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazole"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101925"/>
+        </record>
+
+        <record id="product_product_fret_6" model="product.product">
+            <field name="name">Matériaux de construction</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_mc"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_25171000"/>
+        </record>
+
+        <record id="product_product_fret_7" model="product.product">
+            <field name="name">Matériaux de construction pris en charge</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_mcdgae"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_25171000"/>
+        </record>
+
+        <record id="product_product_fret_8" model="product.product">
+            <field name="name">Palettes vides</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_autre"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_44152000"/>
+        </record>
+
+        <record id="product_product_fret_9" model="product.product">
+            <field name="name">Productions en provenance des îles (Ananas, pastèque, melon, patate douce, citron, pamplemousse, tomate, concombre, carottes)</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_ppiles"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_08109090"/>
+        </record>
+
+        <record id="product_product_fret_10" model="product.product">
+            <field name="name">Produit agricole et élevage</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_ppiles"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_23099040"/>
+        </record>
+
+        <record id="product_product_fret_11" model="product.product">
+            <field name="name">Produit en frigo</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_frigo"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_02021090"/>
+        </record>
+
+        <record id="product_product_fret_12" model="product.product">
+            <field name="name">Produit en frigo pris en charge</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_frigodgae"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_02021090"/>
+        </record>
+
+        <record id="product_product_fret_13" model="product.product">
+            <field name="name">Produits agricoles à destination des îles (Ananas, pastèque, melon, patate douce, citron, pamplemousse, tomate, concombre, carottes)</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_autre"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_07099090"/>
+        </record>
+
+        <record id="product_product_fret_14" model="product.product">
+            <field name="name">Produits de grande consommation</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_pgc"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_07101000"/>
+        </record>
+
+        <record id="product_product_fret_15" model="product.product">
+            <field name="name">Produits de première nécessité PPN pris en charge</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_ppn"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_10063099"/>
+        </record>
+
     </data>
 </odoo>
