@@ -12,6 +12,11 @@ import json
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.onchange('iledepart_id', 'ilearrivee_id')
+    def _onchange_island(self):
+        if self.order_line:
+            self.show_update_pricelist = True
+
     @api.onchange('partner_id', 'partner_shipping_id')
     def _compute_island(self):
         self.iledepart_id = self.partner_id.state_id or False
