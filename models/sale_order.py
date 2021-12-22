@@ -239,9 +239,9 @@ class SaleOrder(models.Model):
             elif self.type_facturation == 'destinataire':
                 paiement = "FAD"
             elif self.type_facturation == 'dgae':
-                paiement = "DGAE"
+                paiement = "FAD"
             elif self.type_facturation == 'aventure':
-                paiement = "AVENTURE"
+                paiement = "FAD"
             payload = {
                 "numeroVoyage": self.voyage_id.name,
                 "paiement": paiement,
