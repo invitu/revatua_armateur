@@ -54,8 +54,6 @@ class SaleOrder(models.Model):
             self._check_order_total(order_response.json())
             # recup pdf
             self.manage_pdf(order_response)
-            # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
-            self.manage_client_ref()
         return res
 
     partner_invoice_id = fields.Many2one(tracking=True)
@@ -282,13 +280,6 @@ class SaleOrder(models.Model):
                 template_id.id, message_type='comment', email_layout_xmlid="mail.mail_notification_paynow")
             template_id.attachment_ids = [(3, attach_id)]
 
-    def manage_client_ref(self):
-        self.client_order_ref = "Connaissement n°" + self.revatua_code +\
-            " - Expéditeur: " + self.partner_id.name +\
-            " - Destinataire: " + self.partner_shipping_id.name +\
-            " - " + self.iledepart_id.name + "/" + self.ilearrivee_id.name +\
-            " - Voyage: " + self.voyage_id.display_name
-
     def _create_invoices(self, grouped=False, final=False, date=None):
         moves = super(SaleOrder, self)._create_invoices(grouped=grouped, final=final, date=date)
         moves._add_minimum_fret_move_line()
@@ -312,8 +303,6 @@ class SaleOrder(models.Model):
                 order.revatua_code = order_confirm.json()["numero"]
                 # recup pdf
                 order.manage_pdf(order_confirm)
-                # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
-                order.manage_client_ref()
             elif order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
                 # Confirmation dans Revatua
                 url = "connaissements/" + order.id_revatua + "/changeretat"
@@ -325,8 +314,6 @@ class SaleOrder(models.Model):
                 order.version = order_confirm.json()["version"]
                 # recup pdf
                 self.manage_pdf(order_confirm)
-                # on génère le libellé pour la référence client qui sera ensuite transférée dans la facture
-                self.manage_client_ref()
             # vérification du subtotal revatua avec celui d'odoo
             order._check_order_total(order_confirm.json())
         return super(SaleOrder, self).action_confirm()
@@ -946,4 +933,30 @@ class SaleOrderLine(models.Model):
                 ilearrivee=self.order_id.ilearrivee_id
             )
         res = super(SaleOrderLine, self)._get_display_price(product)
+        return res
+
+    def _prepare_invoice_line(self, **optional_values):
+        # on génère le libellé pour la facture
+        res = super(SaleOrderLine, self)._prepare_invoice_line(**optional_values)
+        if self.order_id.pricelist_id.type == 'fret':
+            voyage = self.order_id.voyage_id
+            date_depart = fields.Datetime.from_string(voyage.date_depart)
+            if date_depart:
+                date = fields.Datetime.context_timestamp(voyage, date_depart).strftime('%a %d/%m/%Y %H:%M')
+            res['name'] = \
+                "Connaissement n°" + self.order_id.revatua_code +\
+                " - Voyage du " + date
+            fields.Datetime.context_timestamp(voyage, date_depart).strftime('%a %d/%m/%Y %H:%M')
+            if self.order_id.type_facturation == 'expediteur':
+                res['name'] += \
+                    " - Destinataire: " + self.order_id.partner_shipping_id.name
+            elif self.order_id.type_facturation == 'destinataire':
+                res['name'] += \
+                    " - Expéditeur: " + self.order_id.partner_id.name
+            else:
+                res['name'] += \
+                    " - Expéditeur: " + self.order_id.partner_id.name +\
+                    " - Destinataire: " + self.order_id.partner_shipping_id.name
+            res['name'] += " - " + self.name +\
+                " (" + str(self.poids) + " kg - " + str(self.volume) + " m3)"
         return res
