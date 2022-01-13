@@ -128,17 +128,12 @@ class SaleOrder(models.Model):
     @api.depends('iledepart_id', 'ilearrivee_id')
     def _compute_voyage_id_domain(self):
         for order in self:
-            trajet_from_ids = self.env['trajet'].search([
-                ('ile_depart_id', '=', order.iledepart_id.id),
-                ('date_arrivee', '>', datetime.now()),
-            ]).ids
             trajet_to_ids = self.env['trajet'].search([
                 ('ile_arrivee_id', '=', order.ilearrivee_id.id),
                 ('date_arrivee', '>', datetime.now()),
             ]).ids
 
             voyage_list = self.env['voyage'].search([
-                ('trajet_ids', 'in', trajet_from_ids),
                 ('trajet_ids', 'in', trajet_to_ids),
                 ('state', '=', 'confirm'),
             ]).ids
