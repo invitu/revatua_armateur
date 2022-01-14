@@ -31,6 +31,19 @@
             <field name="categ_id" ref="revatua_armateur.product_cat_espft"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
         </record>
+        <record id="full_gazole_fut_200L" model="product.product">
+            <field name="name">Gazole Fût 200L plein</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="type">consu</field>
+            <field name="volume">0.2</field>
+            <field name="weight">200</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazole"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101925"/>
+        </record>
         <record id="empty_fut_200L" model="product.product">
             <field name="name">Fût 200L vide</field>
             <field name="purchase_ok" eval="False"/>
