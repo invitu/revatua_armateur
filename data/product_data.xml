@@ -54,6 +54,16 @@
             <field name="categ_id" ref="revatua_armateur.product_cat_esptq"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
         </record>
+        <record id="essence_petrole_cubi" model="product.product">
+            <field name="name">Essence et Pétrole en Autre contenant (cubitainer...)</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espcubi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
+        </record>
         <record id="full_bouteillegaz_13KG" model="product.product">
             <field name="name">Bouteille de gaz 13 kg pleine</field>
             <field name="purchase_ok" eval="False"/>
