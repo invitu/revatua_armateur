@@ -55,6 +55,37 @@
             <field name="categ_id" ref="revatua_armateur.product_cat_futvide"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73101010"/>
         </record>
+        <record id="empty_hydrocb_contenant" model="product.product">
+            <field name="name">Contenant Hydrocarbure vide en plastique (Cubitainer ...etc)</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espcubi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_39251090"/>
+        </record>
+        <record id="empty_hydrocb_cubi1500" model="product.product">
+            <field name="name">Cubitainer Hydrocarbure 1500L vide</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">1.5</field>
+            <field name="weight">50</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espcubi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_39251090"/>
+        </record>
+        <record id="empty_hydrocb_cubi1820" model="product.product">
+            <field name="name">Cubitainer Hydrocarbure 1820L vide</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="volume">1.82</field>
+            <field name="weight">50</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espcubi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_39251090"/>
+        </record>
         <record id="full_touque_20L" model="product.product">
             <field name="name">Essence ou Pétrole Touque 20L pleine</field>
             <field name="purchase_ok" eval="False"/>
@@ -74,7 +105,7 @@
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="matiere_dangereuse" eval="1"/>
-            <field name="categ_id" ref="revatua_armateur.product_cat_espcubi"/>
+            <field name="categ_id" ref="revatua_armateur.product_cat_espft"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
         </record>
         <record id="full_bouteillegaz_13KG" model="product.product">

@@ -23,7 +23,7 @@
         </record>
         <record id="product_cat_espcubi" model="product.category">
             <field name="code_revatua">ESPCUBI</field>
-            <field name="name">Essence et Pétrole en Autre contenant (cubitainer...)</field>
+            <field name="name">Contenant Hydrocarbure vide en plastique (Cubitainer ...etc)</field>
             <field name="property_cost_method">standard</field>
             <field name="property_valuation">manual_periodic</field>
             <field name="parent_id" ref="product_cat_fret"/>
