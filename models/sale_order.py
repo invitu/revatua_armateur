@@ -320,6 +320,7 @@ class SaleOrder(models.Model):
 
     def action_cancel(self):
         for order in self:
+            res = super(SaleOrder, self).action_cancel()
             if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and order.id_revatua:
                 url = "connaissements/" + order.id_revatua + "/changeretat"
                 payload = {
@@ -329,7 +330,7 @@ class SaleOrder(models.Model):
                 order_confirm = order.env['revatua.api'].api_patch(
                     url, payload)
                 order.version = order_confirm.json()["version"]
-        return super(SaleOrder, self).action_cancel()
+        return res
 
     def action_draft(self):
         for order in self:
