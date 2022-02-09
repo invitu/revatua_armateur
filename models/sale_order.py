@@ -416,7 +416,8 @@ class SaleOrder(models.Model):
         expediteur = None
         if (values['numeroTahiti']):
             expediteur = self.env['res.partner'].search([
-                ('vat', '=', values['numeroTahiti'])
+                ('vat', '=', values['numeroTahiti']),
+                ('is_company', '=', True)
             ]).id
 
         if (values['mail'] and not expediteur):
@@ -458,7 +459,8 @@ class SaleOrder(models.Model):
         destinataire = None
         if (values['numeroTahiti']):
             destinataire = self.env['res.partner'].search([
-                ('vat', '=', values['numeroTahiti'])
+                ('vat', '=', values['numeroTahiti']),
+                ('is_company', '=', True)
             ]).id
 
         if (values['mail'] and not destinataire):
@@ -568,7 +570,7 @@ class SaleOrder(models.Model):
                     'categ_id': self.env['product.category'].search([
                         ('code_revatua',
                          '=', values['codeTarif']['code']),
-                    ]).id,
+                    ])[0].id,
                 })
             res['product_id'] = product_id.id
 
