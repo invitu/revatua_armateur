@@ -531,6 +531,23 @@ class SaleOrder(models.Model):
                             codeshname=values['codeSH']['libelle'],
                             )
             self._create_error_line(res, order_id)
+            # Creation du product.product
+            product_id = self.env['product.product'].create({
+                'name': values['description'],
+                'taxes_id': False,
+                'active': False,
+                'is_fret': True,
+                'matiere_dangereuse': values['matiereDangereuse'],
+                'purchase_ok': False,
+                'nomenclaturepfcustoms_id': self.env['nomenclature.pf.customs'].search([
+                    ('code',
+                     'like', values['codeSH']['nomenclature'])
+                ]).id,
+                'categ_id': self.env['product.category'].search([
+                    ('code_revatua',
+                     '=', values['codeTarif']['code']),
+                ])[0].id,
+            })
         return res
 
     def _create_error_line(self, error_line, connaissement_id):
@@ -555,23 +572,6 @@ class SaleOrder(models.Model):
                 ('nomenclaturepfcustoms_id.code',
                  'like', values['codeSH']['nomenclature'])
             ])
-            if not product_id:
-                product_id = self.env['product.product'].create({
-                    'name': values['description'],
-                    'taxes_id': False,
-                    'active': False,
-                    'is_fret': True,
-                    'matiere_dangereuse': values['matiereDangereuse'],
-                    'purchase_ok': False,
-                    'nomenclaturepfcustoms_id': self.env['nomenclature.pf.customs'].search([
-                        ('code',
-                         'like', values['codeSH']['nomenclature'])
-                    ]).id,
-                    'categ_id': self.env['product.category'].search([
-                        ('code_revatua',
-                         '=', values['codeTarif']['code']),
-                    ])[0].id,
-                })
             res['product_id'] = product_id.id
 
         if (values['contenant']):
