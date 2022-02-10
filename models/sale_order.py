@@ -287,6 +287,7 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for order in self:
+            res = super(SaleOrder, self).action_confirm()
             if order.type_id == self.env.ref('revatua_armateur.fret_sale_type') and not order.id_revatua:
                 payload = order.compute_payload()
                 order_response = order.env['revatua.api'].api_post(
@@ -316,7 +317,7 @@ class SaleOrder(models.Model):
                 self.manage_pdf(order_confirm)
             # vérification du subtotal revatua avec celui d'odoo
             order._check_order_total(order_confirm.json())
-        return super(SaleOrder, self).action_confirm()
+        return res
 
     def action_cancel(self):
         for order in self:
