@@ -335,5 +335,16 @@
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_10063099"/>
         </record>
 
+        <record id="product_product_fret_16" model="product.product">
+            <field name="name">Produits fabriqués ou transformés dans les îles</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_pfi"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_20079930"/>
+        </record>
+
     </data>
 </odoo>
