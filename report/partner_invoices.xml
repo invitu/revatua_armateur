@@ -11,10 +11,12 @@
                         <t t-call="revatua_armateur.report_partner_invoices_header" />
 
                         <div class="page ">
-                            <div class="row top_header p-2">
-                                <span style="text-decoration-line: underline;">Date:</span>
-                                <span t-esc=" context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')" />
-                            </div>
+                            <t t-if="not is_dgae">
+                                <div class="row top_header p-2">
+                                    <span style="text-decoration-line: underline;">Date:</span>
+                                    <span t-esc=" context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                                </div>
+                            </t>
 
                             <!-- Set total of all table's total -->
                             <t t-set="full_total_poids" t-value="0" />
@@ -229,10 +231,22 @@
     <template id="report_partner_invoices_header">
         <div class="top_header" style="position:relative;min-height: 30px;">
             <div style="float: left;">
-                RELEVÉ DE FACTURES DES VOYAGES du 
-                <t t-esc="data['date_from']" />
-                au 
-                <t t-esc="data['date_at']" />
+                <t t-if="is_dgae">
+                    <div>
+                        Facture n°
+                        <span t-esc="data['date_at']" t-options="{'widget': 'date', 'format': 'YYYYMMdd'}" />
+                    </div>
+                    <div>
+                        Du
+                        <span t-esc="data['date_at']" t-options="{'widget': 'date', 'format': 'dd-MM-YYYY'}"/>
+                    </div>
+                </t>
+                <t t-else="">
+                    RELEVÉ DE FACTURES DES VOYAGES du
+                    <t t-esc="data['date_from']" />
+                    au
+                    <t t-esc="data['date_at']" />
+                </t>
             </div>
             <div style="float: right; width: 40%; text-align: center;">
                 <div>
