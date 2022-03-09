@@ -52,7 +52,7 @@ class Picking(models.Model):
                     "nbColisPresent": picking.total_product_uom_qty
                 }
                 self.env['revatua.api'].api_patch(url, payload)
-        return super(Picking, self)._action_done()
+            return super(Picking, self)._action_done()
 
     def button_validate(self):
         for picking in self:
