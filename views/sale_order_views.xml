@@ -43,6 +43,18 @@
         </field>
     </record>
 
+    <record id="sale_order_filter_revatua" model="ir.ui.view">
+        <field name="name">sale.order.filter.revatua</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter" />
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="revatua_code"/>
+                <field name="voyage_id"/>
+            </field>
+        </field>
+    </record>
+
     <record id="sale_order_view_form_revatua" model="ir.ui.view">
         <field name="name">sale.order.form.view.revatua</field>
         <field name="model">sale.order</field>
