@@ -35,7 +35,7 @@ class AccountMove(models.Model):
                     'price_unit': correction,
                     'product_uom_id': self.env.ref('uom.product_uom_unit').id,
                 }
-                move.write({'invoice_line_ids': [(0, 0, correction_values)]})
+                move.sudo().write({'invoice_line_ids': [(0, 0, correction_values)]})
 
 
 class AccountMoveLine(models.Model):
