@@ -46,13 +46,14 @@ class Picking(models.Model):
     def _action_done(self):
         for picking in self:
             if (picking.picking_type_id.code == 'internal' and picking.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
+                res = super(Picking, self)._action_done()
                 url = "connaissements/" + picking.sale_id.id_revatua + "/changeretat"
                 payload = {
                     "evenementConnaissementEnum": "EMBARQUE",
                     "nbColisPresent": picking.total_product_uom_qty
                 }
                 self.env['revatua.api'].api_patch(url, payload)
-            return super(Picking, self)._action_done()
+            return res
 
     def button_validate(self):
         for picking in self:
