@@ -108,6 +108,18 @@
             <field name="categ_id" ref="revatua_armateur.product_cat_espft"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27101223"/>
         </record>
+        <record id="full_bouteillegaz_5KG" model="product.product">
+            <field name="name">Bouteille de gaz 5 kg pleine</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="is_fret" eval="1"/>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="matiere_dangereuse" eval="1"/>
+            <field name="volume">0.027</field>
+            <field name="weight">8</field>
+            <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
+            <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
+        </record>
         <record id="full_bouteillegaz_13KG" model="product.product">
             <field name="name">Bouteille de gaz 13 kg pleine</field>
             <field name="purchase_ok" eval="False"/>
@@ -115,8 +127,8 @@
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="matiere_dangereuse" eval="1"/>
-            <field name="volume">0.0522</field>
-            <field name="weight">28</field>
+            <field name="volume">0.045</field>
+            <field name="weight">30</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
         </record>
@@ -126,8 +138,8 @@
             <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
-            <field name="volume">0.0522</field>
-            <field name="weight">15</field>
+            <field name="volume">0.045</field>
+            <field name="weight">17</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl13"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73110000"/>
         </record>
@@ -138,8 +150,8 @@
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
             <field name="matiere_dangereuse" eval="1"/>
-            <field name="volume">0.1805</field>
-            <field name="weight">83.5</field>
+            <field name="volume">0.138</field>
+            <field name="weight">85</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_27111310"/>
         </record>
@@ -149,8 +161,8 @@
             <field name="is_fret" eval="1"/>
             <field name="taxes_id" eval="[(5,)]"/>
             <field name="supplier_taxes_id" eval="[(5,)]"/>
-            <field name="volume">0.1805</field>
-            <field name="weight">33.5</field>
+            <field name="volume">0.138</field>
+            <field name="weight">35</field>
             <field name="categ_id" ref="revatua_armateur.product_cat_gazbtl50"/>
             <field name="nomenclaturepfcustoms_id" ref="l10n_pf_customs_nomenclature.nomenclature_pf_customs_73110000"/>
         </record>
