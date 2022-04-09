@@ -182,7 +182,7 @@ class SaleOrder(models.Model):
                     "unitePoids": line.unite_poids.code_revatua,
                     "volume": volumetotal,
                     "uniteVolume": line.unite_volume.code_revatua,
-                    "matieredangereuse": "true" and line.product_id.matiere_dangereuse or "false",
+                    "matiereDangereuse": "true" and line.product_id.matiere_dangereuse or "false",
                 }
                 if not line.official_price:
                     datas["montantLibre"] = line.price_subtotal
