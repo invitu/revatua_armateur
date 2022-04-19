@@ -45,6 +45,11 @@ class SaleOrder(models.Model):
                     'partner_shipping_id', 'type_facturation', 'iledepart_id',
                     'ilearrivee_id', 'voyage_id', 'order_line'
                 )) and self.id_revatua and 'sale' in self.mapped('state'):
+            # Ici on récupère l'état du connaissement chez Revatua
+            url = "connaissements/" + self.id_revatua
+            order_response = self.env['revatua.api'].api_get(url)
+            etat_initial = order_response.json()["dernierEtat"]["evenementConnaissement"]
+            # Maintenant, on modifie le connaissement
             url = "connaissements/" + self.id_revatua
             payload = self.compute_payload()
             payload['version'] = self.version
@@ -54,6 +59,15 @@ class SaleOrder(models.Model):
             self._check_order_total(order_response.json())
             # recup pdf
             self.manage_pdf(order_response)
+            # Si le connaissement a été débarqué, on le réembarque
+            if etat_initial == "EMBARQUE":
+                nbcolis = sum(line.product_uom_qty for line in self.order_line)
+                url = "connaissements/" + self.id_revatua + "/changeretat"
+                payload = {
+                    "evenementConnaissementEnum": "EMBARQUE",
+                    "nbColisPresent": nbcolis
+                }
+                self.env['revatua.api'].api_patch(url, payload)
         return res
 
     partner_invoice_id = fields.Many2one(tracking=True)
