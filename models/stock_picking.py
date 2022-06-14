@@ -16,8 +16,8 @@ class Picking(models.Model):
     def _compute_shipping_qty(self):
         for picking in self:
             total_qty = 0.0
-            for move_line in picking.move_line_ids:
-                if move_line.product_id and not move_line.result_package_id:
+            for move_line in picking.move_lines:
+                if move_line.product_id:
                     total_qty += move_line.product_uom_qty
             picking.total_product_uom_qty = total_qty
 
@@ -43,17 +43,20 @@ class Picking(models.Model):
                             picking.scheduled_date = arrival_date
                         break
 
+    def _confirm_picking_revatua(self):
+        self.ensure_one()
+        if (self.picking_type_id.code == 'internal' and self.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
+            url = "connaissements/" + self.sale_id.id_revatua + "/changeretat"
+            payload = {
+                "evenementConnaissementEnum": "EMBARQUE",
+                "nbColisPresent": self.total_product_uom_qty
+            }
+            self.env['revatua.api'].api_patch(url, payload)
+
     def _action_done(self):
         for picking in self:
-            if (picking.picking_type_id.code == 'internal' and picking.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
-                res = super(Picking, self)._action_done()
-                url = "connaissements/" + picking.sale_id.id_revatua + "/changeretat"
-                payload = {
-                    "evenementConnaissementEnum": "EMBARQUE",
-                    "nbColisPresent": picking.total_product_uom_qty
-                }
-                self.env['revatua.api'].api_patch(url, payload)
-            return res
+            picking._confirm_picking_revatua()
+        return super(Picking, self)._action_done()
 
     def button_validate(self):
         for picking in self:
