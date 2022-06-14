@@ -46,12 +46,18 @@ class Picking(models.Model):
     def _confirm_picking_revatua(self):
         self.ensure_one()
         if (self.picking_type_id.code == 'internal' and self.sale_id.type_id == self.env.ref('revatua_armateur.fret_sale_type')):
-            url = "connaissements/" + self.sale_id.id_revatua + "/changeretat"
-            payload = {
-                "evenementConnaissementEnum": "EMBARQUE",
-                "nbColisPresent": self.total_product_uom_qty
-            }
-            self.env['revatua.api'].api_patch(url, payload)
+            # Ici on récupère l'état du connaissement chez Revatua
+            url = "connaissements/" + self.sale_id.id_revatua
+            order_response = self.env['revatua.api'].api_get(url)
+            etat_initial = order_response.json()["dernierEtat"]["evenementConnaissement"]
+            # Si pas embarque, on embarque
+            if etat_initial == "OFFICIALISE":
+                url = "connaissements/" + self.sale_id.id_revatua + "/changeretat"
+                payload = {
+                    "evenementConnaissementEnum": "EMBARQUE",
+                    "nbColisPresent": self.total_product_uom_qty
+                }
+                self.env['revatua.api'].api_patch(url, payload)
 
     def _action_done(self):
         for picking in self:
