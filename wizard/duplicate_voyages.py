@@ -16,8 +16,8 @@ class DuplicateVoyages(models.TransientModel):
 
     def duplicate_voyages(self):
         voyages = self.env['voyage'].browse(self._context.get('active_ids', []))
-        if self.deltadays <= 0 or self.deltadays > 28:
-            raise UserError(_("You cannot duplicate voyages to less than 1 day or more than 28 days."))
+        if self.deltadays <= 0 or self.deltadays > 91:
+            raise UserError(_("You cannot duplicate voyages to less than 1 day or more than 91 days."))
         for voyage in voyages:
             new_voyage = voyage.copy()
             new_voyage.date_arrivee = new_voyage.date_arrivee and new_voyage.date_arrivee + timedelta(days=self.deltadays) or ''
