@@ -61,7 +61,7 @@ class SaleOrder(models.Model):
             self.manage_pdf(order_response)
             # Si le connaissement a été débarqué, on le réembarque
             if etat_initial == "EMBARQUE":
-                nbcolis = sum(line.product_uom_qty for line in self.order_line)
+                nbcolis = self.nbcolis and self.nbcolis or sum(line.product_uom_qty for line in self.order_line)
                 url = "connaissements/" + self.id_revatua + "/changeretat"
                 payload = {
                     "evenementConnaissementEnum": "EMBARQUE",
@@ -111,6 +111,7 @@ class SaleOrder(models.Model):
     poids_best = fields.Boolean('Poids Avantageux', compute='_compute_best_weight',
                                 store=True,
                                 help='True if the total weight of the connaissement is higher than the total volume')
+    nbcolis = fields.Integer("Nbre de colis à embarquer")
 
     @api.onchange('partner_invoice_id')
     def onchange_partner_invoice_id(self):
@@ -366,6 +367,7 @@ class SaleOrder(models.Model):
                 'version': conn['version'],
                 'partner_id': self._set_expediteur(conn['expediteur']),
                 'partner_shipping_id': self._set_destinataire(conn['destinataire']),
+                'nbcolis': conn['nombreColisAEmbarquer'],
             }
 
             if (conn['paiement'] == 'EXPEDITEUR'):

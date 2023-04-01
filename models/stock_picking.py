@@ -53,10 +53,16 @@ class Picking(models.Model):
             # Si pas embarque, on embarque
             if etat_initial == "OFFICIALISE":
                 url = "connaissements/" + self.sale_id.id_revatua + "/changeretat"
-                payload = {
-                    "evenementConnaissementEnum": "EMBARQUE",
-                    "nbColisPresent": self.total_product_uom_qty
-                }
+                if self.sale_id.nbcolis:
+                    payload = {
+                        "evenementConnaissementEnum": "EMBARQUE",
+                        "nbColisPresent": self.sale_id.nbcolis
+                    }
+                else:
+                    payload = {
+                        "evenementConnaissementEnum": "EMBARQUE",
+                        "nbColisPresent": self.total_product_uom_qty
+                    }
                 self.env['revatua.api'].api_patch(url, payload)
 
     def _action_done(self):
