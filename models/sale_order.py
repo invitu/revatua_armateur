@@ -434,20 +434,27 @@ class SaleOrder(models.Model):
         if (values['numeroTahiti']):
             expediteur = self.env['res.partner'].search([
                 ('vat', '=', values['numeroTahiti']),
+                ('parent_id', '=', None),
                 ('is_company', '=', True)
-            ]).id
+            ], limit=1).id
 
         if (values['mail'] and not expediteur):
             expediteur = self.env['res.partner'].search([
+                '&',
+                ('vat', '=', None),
                 ('email', '=', values['mail'])
-            ]).id
+            ], limit=1).id
 
         if (values['telephone'] and not expediteur):
             expediteur = self.env['res.partner'].search([
+                '&',
+                '&',
+                ('vat', '=', None),
+                ('email', '=', None),
                 '|',
                 ('mobile', '=', values['telephone']),
                 ('phone', '=', values['telephone'])
-            ]).id
+            ], limit=1).id
 
         if (not expediteur):
             new_partner = {
@@ -477,20 +484,27 @@ class SaleOrder(models.Model):
         if (values['numeroTahiti']):
             destinataire = self.env['res.partner'].search([
                 ('vat', '=', values['numeroTahiti']),
+                ('parent_id', '=', None),
                 ('is_company', '=', True)
-            ]).id
+            ], limit=1).id
 
         if (values['mail'] and not destinataire):
             destinataire = self.env['res.partner'].search([
+                '&',
+                ('vat', '=', None),
                 ('email', '=', values['mail'])
-            ]).id
+            ], limit=1).id
 
         if (values['telephone'] and not destinataire):
             destinataire = self.env['res.partner'].search([
+                '&',
+                '&',
+                ('vat', '=', None),
+                ('email', '=', None),
                 '|',
                 ('mobile', '=', values['telephone']),
                 ('phone', '=', values['telephone'])
-            ]).id
+            ], limit=1).id
 
         if (not destinataire):
             new_partner = {
